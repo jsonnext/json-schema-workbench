@@ -5,6 +5,7 @@ import { join } from "path"
 
 async function getSchemas() {
   const data = await readFile(
+    // TODO: this is not ideal, but works locally and on vercel for now
     join(process.cwd(), "app/api/data/indexes/schemastore.json")
   )
   return data

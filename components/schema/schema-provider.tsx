@@ -137,6 +137,7 @@ export const SchemaProvider = ({ children }: SchemaProviderProps) => {
       })
   }, [])
 
+
   // called via autocomplete, or perhaps eventually by custom URL input
   const setSelectedSchema = useCallback((option: SchemaSelectorValue) => {
     if (option) {
@@ -144,7 +145,7 @@ export const SchemaProvider = ({ children }: SchemaProviderProps) => {
         type: SchemaActionType.setSelectedSchema,
         payload: option,
       })
-      fetch(option.value, { headers: { ContentType: "application/json" } })
+      fetch(`/api/schema?${new URLSearchParams({ url: option.value })}`)
         .then((res) => res.json())
         .then((schema) => {
           action({
