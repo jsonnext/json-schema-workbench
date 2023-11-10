@@ -17,6 +17,7 @@ export async function GET(request: Request) {
   try {
     const url = searchParams.get("url")
     if (!url) {
+      
       return new Response("No schema key provided", {
         status: 400,
       })
