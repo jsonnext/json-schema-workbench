@@ -51,7 +51,7 @@ export const AutoComplete = <T = {}>({
       if (!isOpen) {
         setOpen(true)
       }
-      if(event.key === "Backspace" && input && input.value.length === (input.selectionEnd ?? 0 - input?.selectionStart ?? 0)) {
+      if(event.key === "Backspace" && input && input.value.length === (input.selectionEnd ?? 0 - (input?.selectionStart || 0))) {
         setSelected(undefined)
       }
 
@@ -86,7 +86,7 @@ export const AutoComplete = <T = {}>({
   }, [selected])
 
   const handleSelectOption = useCallback(
-    (selectedOption: Option) => {
+    (selectedOption: Option & T) => {
       setInputValue(selectedOption.label)
 
       setSelected(selectedOption)
@@ -113,6 +113,8 @@ export const AutoComplete = <T = {}>({
           placeholder={placeholder}
           disabled={disabled}
           className="text-base"
+          role="combobox"
+          aria-haspopup="listbox"
         />
       </div>
       <div className="relative mt-1">

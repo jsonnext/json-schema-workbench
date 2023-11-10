@@ -26,18 +26,19 @@ export type SchemaResponse = {
 }
 
 export const SchemaSelector = () => {
-  const { setSelectedSchema, index } = useSchemaContext()
+  const { setSelectedSchema, index, schema } = useSchemaContext()
   return (
     <AutoComplete<SchemaDetails>
       emptyMessage="pick a schema"
-      options={index}
+      options={index ?? []}
       onValueChange={setSelectedSchema}
+      
       Results={({ option, selected }) => (
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <span className="font-medium">{option.label}</span>
             {option.description && (
-              <span className="mt-2 text-xs text-slate-600 dark:text-slate-300">
+              <span className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                 {option.description}
               </span>
             )}

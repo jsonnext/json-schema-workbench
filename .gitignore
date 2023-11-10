@@ -35,5 +35,4 @@ yarn-error.log*
 .contentlayer
 .env
 
-data/indexes/*.json
-data/schemas/*.json
+app/api/data/indexes/schemastore.json

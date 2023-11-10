@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
-    "postinstall": "curl -L https://www.schemastore.org/api/json/catalog.json > data/indexes/schemastore.json > public/schemastore.json"
+    "postinstall": "curl -L https://www.schemastore.org/api/json/catalog.json > app/api/data/indexes/schemastore.json"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.11.0",

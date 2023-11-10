@@ -1,12 +1,12 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "Next.js",
+  name: "JSON Schema Validation Workbench",
   description:
-    "Beautifully designed components built with Radix UI and Tailwind CSS.",
+    "Validate, autocomplete and author json schemas with a free tool!",
   mainNav: [
     {
-      title: "Home",
+      title: "Workbench",
       href: "/",
     },
   ],
