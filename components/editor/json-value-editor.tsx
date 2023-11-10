@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic"
 
-import { useSchemaContext } from "../schema/schema-provider"
+import { useSchemaContext } from "@/contexts/schema"
 
 const JSONEditor = dynamic(
   async () => (await import("./json-editor")).JSONEditor,

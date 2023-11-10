@@ -1,10 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Check } from "lucide-react"
 
-import { AutoComplete } from "../ui/autocomplete"
-import { useSchemaContext } from "./schema-provider"
+import { AutoComplete } from "@/components/ui/autocomplete"
+import { useSchemaContext } from "@/contexts/schema"
 
 export type SchemaDetails = {
   description: string
@@ -45,7 +44,7 @@ export const SchemaSelector = () => {
             {option.fileMatch && (
               <span className="mt-1 whitespace-break-spaces text-xs text-slate-600 dark:text-slate-300">
                 {option.fileMatch.map((f) => (
-                  <code className="rounded-xs mr-1 bg-slate-900 p-1" key={f}>
+                  <code className="rounded-sm mr-1 dark:bg-slate-900 p-0.5 bg-slate-200 text-xs" key={f}>
                     {f}
                   </code>
                 ))}

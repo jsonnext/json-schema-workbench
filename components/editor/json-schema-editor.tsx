@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 
-import { useSchemaContext } from "../schema/schema-provider"
+import { useSchemaContext } from "@/contexts/schema"
 
 const JSONEditor = dynamic(
   async () => (await import("./json-editor")).JSONEditor,
   { ssr: false }
 )
 
-export const JSONSchemaEditor = () => {
-  const { schema, setSchema } = useSchemaContext()
+ const useSchemaEditor = () => {
+  const { schema, setSchema, selectedSchema } = useSchemaContext()
   const [schemaSpec, setSchemaSpec] = useState()
-  // load the spec schema on change based on incoming spec, or use the latest
+  const [value, setValue] = useState(JSON.stringify(schema, null, 2))
   useEffect(() => {
     const schemaUrl =
       schema && schema["$schema"]
@@ -22,12 +22,29 @@ export const JSONSchemaEditor = () => {
 
     fetch(schemaUrl)
       .then((res) => res.json())
-      .then((res) => setSchemaSpec(res))
-  }, [schema])
+      .then((res) => {
+        setSchemaSpec(res)
+        setValue(JSON.stringify(schema, null, 2))
+        // setValue(JSON.stringify(res, null, 2))
+      })
+    // don't add value here on purpose. let cm6 state handle that
+  }, [selectedSchema, setSchemaSpec])
+
+  useEffect(() => {
+    if (schema) {
+      setValue(JSON.stringify(schema, null, 2))
+    }
+  }, [selectedSchema, setValue, schema])
+  return { setSchema, value, schemaSpec }
+}
+
+export const JSONSchemaEditor = () => {
+
+  const { setSchema, value, schemaSpec } = useSchemaEditor()
   return (
     <JSONEditor
       onValueChange={(val) => setSchema(JSON.parse(val))}
-      value={JSON.stringify(schema, null, 2)}
+      value={value}
       // json schema spec v? allow spec selection
       schema={schemaSpec}
     />

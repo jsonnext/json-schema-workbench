@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils"
 import { SiteHeader } from "@/components/nav/site-header"
 import { TailwindIndicator } from "@/components/nav/tailwind-indicator"
 import { ThemeProvider } from "@/components/providers/theme-provider"
-import { SchemaProvider } from "@/components/schema/schema-provider"
+import { SchemaProvider } from "@/contexts/schema"
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: {
@@ -43,13 +44,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
         >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <SchemaProvider>
-              <div className="relative flex min-h-screen flex-col">
+              <div className="relative flex min-h-screen flex-col p-2">
                 <SiteHeader />
-                <div className="flex-1">{children}</div>
+                <div className="flex">{children}</div>
               </div>
               <TailwindIndicator />
             </SchemaProvider>
           </ThemeProvider>
+          <Toaster />
         </body>
       </html>
     </>

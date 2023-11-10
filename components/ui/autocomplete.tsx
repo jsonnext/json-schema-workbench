@@ -4,7 +4,7 @@ import { CommandGroup, CommandItem, CommandList, CommandInput } from "@/componen
 import { Command as CommandPrimitive } from "cmdk"
 import { useState, useRef, useCallback, type KeyboardEvent, ReactNode, ReactElement, JSXElementConstructor } from "react"
 
-import { Skeleton } from "./skeleton"
+import { Skeleton } from  "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { Check } from "lucide-react"
 
@@ -103,7 +103,7 @@ export const AutoComplete = <T = {}>({
 
   return (
     <CommandPrimitive onKeyDown={handleKeyDown}>
-      <div>
+      <div className="w-full">
         <CommandInput
           ref={inputRef}
           value={inputValue}
@@ -112,7 +112,7 @@ export const AutoComplete = <T = {}>({
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
           disabled={disabled}
-          className="text-base"
+          className="text-base w-full border-b-0"
           role="combobox"
           aria-haspopup="listbox"
         />

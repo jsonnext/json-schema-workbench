@@ -9,7 +9,8 @@ import {
   useReducer,
 } from "react"
 
-import { SchemaResponse, SchemaSelectorValue } from "./schema-selector"
+import { SchemaResponse, SchemaSelectorValue } from "@/components/schema/schema-selector"
+import { useToast } from "@/components/ui/use-toast"
 
 type SchemaProviderProps = React.PropsWithChildren<{}>
 
@@ -86,6 +87,7 @@ const schemaReducer = (
         schema: undefined,
       }
     case "setSchema": {
+      console.log('setSchema', action.payload.schema)
       return {
         ...state,
         schema: action.payload.schema,
@@ -120,6 +122,7 @@ const schemaReducer = (
 
 export const SchemaProvider = ({ children }: SchemaProviderProps) => {
   const [state, action] = useReducer(schemaReducer, initialState)
+  const { toast } = useToast()
   useEffect(() => {
     fetch("/api/schemas")
       .then<SchemaResponse>((res) => res.json())
@@ -130,6 +133,11 @@ export const SchemaProvider = ({ children }: SchemaProviderProps) => {
         })
       })
       .catch((err) => {
+        toast({
+          title: "Error loading schema index",
+          description: err.message,
+          variant: "destructive",
+        })
         action({
           type: SchemaActionType.schemaErrorsIndex,
           payload: { error: err.message },
@@ -152,11 +160,20 @@ export const SchemaProvider = ({ children }: SchemaProviderProps) => {
             type: SchemaActionType.setSchema,
             payload: { schema },
           })
+          toast({
+            title: "Schema loaded",
+            description: option.label,
+          })
         })
         .catch((err) => {
           action({
             type: SchemaActionType.schemaError,
             payload: { error: err.message },
+          })
+          toast({
+            title: "Error loading schema",
+            description: err.message,
+            variant: "destructive",
           })
         })
     }
