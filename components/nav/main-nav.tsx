@@ -4,6 +4,7 @@ import Link from "next/link"
 import { NavItem } from "@/types/nav"
 import { siteConfig } from "@/config/site"
 import { SchemaSelector } from "@/components/schema/schema-selector"
+import { Icons } from '../icons'
 
 interface MainNavProps {
   items?: NavItem[]
@@ -13,7 +14,8 @@ export function MainNav({ items }: MainNavProps) {
   return (
     <div className="flex min-w-[800px] gap-6 md:gap-10">
       <Link href="/" className="flex items-center space-x-2">
-        <span className="inline-block font-bold">{siteConfig.name}</span>
+        <Icons.Logo />
+        <span className="inline-block font-bold">Workbench</span>
       </Link>
       {/* {items?.length ? (
         <nav className="flex gap-6">
