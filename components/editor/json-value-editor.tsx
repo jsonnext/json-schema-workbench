@@ -1,7 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useSchemaContext } from "@/contexts/schema"
+import { useMainStore } from "@/store/main"
 
 import { Icons } from "../icons"
 import { Button } from "../ui/button"
@@ -12,7 +12,7 @@ const JSONEditor = dynamic(
 )
 
 export const JSONValueEditor = () => {
-  const { schema } = useSchemaContext()
+  const schema = useMainStore((state) => state.schema)
   return (
     <>
       <div className="flex items-center justify-between">
@@ -24,13 +24,7 @@ export const JSONValueEditor = () => {
         </div>
       </div>
 
-      <JSONEditor
-        value={"{ }"}
-        // json schema spec v? allow spec selection
-        schema={schema}
-        className="flex-1 overflow-auto"
-        height="100%"
-      />
+      <JSONEditor value={"{ }"} schema={schema} />
     </>
   )
 }
