@@ -20,7 +20,9 @@ export default function IndexPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <JSONSchemaEditor />
+          <div className="h-full overflow-scroll">
+            <JSONSchemaEditor />
+          </div>
         </CardContent>
       </Card>
       <Card>
@@ -29,7 +31,9 @@ export default function IndexPage() {
           <CardDescription>Enter your JSON data</CardDescription>
         </CardHeader>
         <CardContent>
-          <JSONValueEditor />
+          <div className="h-full overflow-scroll">
+            <JSONValueEditor />
+          </div>
         </CardContent>
       </Card>
     </section>
