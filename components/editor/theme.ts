@@ -18,7 +18,7 @@ const chalky = "#e5c07b",
   darkBackground = "rgb(15 23 42 / 1)", 
   highlightBackground = "rgb(30 41 59 / 1)",  // 71 85 105
   background = "rgb(15 23 42 / 1)",
-  tooltipBackground = "rgb(15 23 42 / .5)",
+  tooltipBackground = "rgb(30 41 59 / 1)",
   selection = "#3E4451",
   cursor = "#528bff"
 
