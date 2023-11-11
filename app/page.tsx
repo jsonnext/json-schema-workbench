@@ -1,13 +1,14 @@
+
 import { JSONSchemaEditor } from "@/components/editor/json-schema-editor"
 import { JSONValueEditor } from "@/components/editor/json-value-editor"
 
 export default function IndexPage() {
   return (
-    <section className="w-full grid items-center gap-2 pb-8 grid-cols-2 h-[90vh]">
-      <div id="json-schema-editor" className="h-full overflow-scroll">
+    <section className="grid h-[90vh] w-full grid-cols-2 gap-2 pb-8">
+      <div id="json-schema-editor" className="flex h-full flex-col overflow-scroll">
         <JSONSchemaEditor />
       </div>
-      <div id="json-value-editor" className="h-full overflow-scroll">
+      <div id="json-value-editor" className="flex h-full flex-col overflow-scroll">
         <JSONValueEditor />
       </div>
     </section>
