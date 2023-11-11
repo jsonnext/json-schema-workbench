@@ -112,7 +112,7 @@ export const AutoComplete = <T = {}>({
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
           disabled={disabled}
-          className="text-base w-full border-b-0"
+          className="text-base w-full border-none dark:bg-slate-800 p-2"
           role="combobox"
           aria-haspopup="listbox"
         />
