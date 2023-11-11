@@ -20,8 +20,6 @@ export const JSONSchemaEditor = () => {
     state.setSchema,
   ])
 
-  console.log({ pristineSchema })
-
   useEffect(() => {
     loadIndex()
   }, [loadIndex])
