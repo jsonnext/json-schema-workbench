@@ -38,6 +38,8 @@ export const JSONSchemaEditor = () => {
         value={JSON.stringify(pristineSchema, null, 2)}
         // json schema spec v? allow spec selection
         schema={schemaSpec}
+        className="flex-1 overflow-auto"
+        height="100%"
       />
     </>
   )

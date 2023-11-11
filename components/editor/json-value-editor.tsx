@@ -24,7 +24,12 @@ export const JSONValueEditor = () => {
         </div>
       </div>
 
-      <JSONEditor value={"{ }"} schema={schema} />
+      <JSONEditor
+        value={"{ }"}
+        schema={schema}
+        className="flex-1 overflow-auto"
+        height="100%"
+      />
     </>
   )
 }
