@@ -8,13 +8,11 @@ import { lintGutter } from "@codemirror/lint"
 import { EditorState } from "@codemirror/state"
 import { oneDark, oneDarkHighlightStyle } from "@codemirror/theme-one-dark"
 import { EditorView, ViewUpdate, gutter, lineNumbers } from "@codemirror/view"
-import CodeMirror, { ReactCodeMirrorRef } from "@uiw/react-codemirror"
+import CodeMirror, { ReactCodeMirrorProps, ReactCodeMirrorRef } from "@uiw/react-codemirror"
 import { basicSetup } from "codemirror"
 import { jsonSchema, updateSchema } from "codemirror-json-schema"
 // @ts-expect-error TODO: fix this in the lib!
 import { json5Schema } from "codemirror-json-schema/json5"
-import json5 from "json5"
-import debounce from "lodash-es/debounce"
 
 // import { debounce } from "@/lib/utils"
 import { jsonDark, jsonDarkTheme } from "./theme"
@@ -40,17 +38,19 @@ const commonExtensions = [
   syntaxHighlighting(oneDarkHighlightStyle),
 ]
 
+interface JSONEditorProps extends ReactCodeMirrorProps {
+  value: string;
+  onValueChange?: (newValue: string) => void;
+  schema?: Record<string, unknown>;
+  mode?: "json5" | "json4";
+}
 export const JSONEditor = ({
   value,
   schema,
   onValueChange = () => {},
   mode = "json4",
-}: {
-  value: string
-  onValueChange?: (newValue: string) => void
-  schema?: Record<string, unknown>
-  mode?: "json5" | "json4"
-}) => {
+  ...rest
+}: JSONEditorProps) => {
   const isJson5 = mode === "json5"
   const defaultExtensions = [
     ...commonExtensions,
@@ -72,7 +72,7 @@ export const JSONEditor = ({
       onChange={onValueChange}
       theme={jsonDarkTheme}
       ref={editorRef}
-      minHeight="300px"
+      {...rest}
     />
   )
 }

@@ -21,7 +21,8 @@ const chalky = "#e5c07b",
   background = "rgb(15 23 42 / 1)",
   tooltipBackground = "rgb(30 41 59 / 1)",
   selection = "#3E4451",
-  cursor = "#528bff"
+  cursor = "#528bff",
+  borderRadius = '10px';
 
 //   --tw-bg-opacity: 1;
 //     background-color: rgb(30 41 59 / var(--tw-bg-opacity));
@@ -50,7 +51,8 @@ export const color = {
 export const oneDarkTheme = EditorView.theme({
   "&": {
     color: ivory,
-    backgroundColor: background
+    backgroundColor: background,
+    borderRadius: borderRadius,
   },
 
   ".cm-content": {
@@ -60,6 +62,7 @@ export const oneDarkTheme = EditorView.theme({
   ".cm-cursor, .cm-dropCursor": {borderLeftColor: cursor},
   "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {backgroundColor: selection},
 
+  '.cm-scroller': {borderRadius: borderRadius},
   ".cm-panels": {backgroundColor: darkBackground, color: ivory},
   ".cm-panels.cm-panels-top": {borderBottom: "2px solid black"},
   ".cm-panels.cm-panels-bottom": {borderTop: "2px solid black"},
