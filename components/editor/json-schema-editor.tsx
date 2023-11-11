@@ -28,7 +28,7 @@ const JSONEditor = dynamic(
         // setValue(JSON.stringify(res, null, 2))
       })
     // don't add value here on purpose. let cm6 state handle that
-  }, [selectedSchema, setSchemaSpec])
+  }, [selectedSchema, setSchemaSpec, schema])
 
   useEffect(() => {
     if (schema) {

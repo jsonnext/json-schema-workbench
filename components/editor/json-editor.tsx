@@ -10,9 +10,12 @@ import { oneDark, oneDarkHighlightStyle } from "@codemirror/theme-one-dark"
 import { EditorView, ViewUpdate, gutter, lineNumbers } from "@codemirror/view"
 import { basicSetup } from "codemirror"
 import { jsonSchema, updateSchema } from "codemirror-json-schema"
+// @ts-expect-error TODO: fix this in the lib!
+import { json5Schema } from "codemirror-json-schema/json5"
+import json5 from "json5"
 
 import { debounce } from "@/lib/utils"
-
+import { jsonDark } from "./theme"
 
 const jsonText = `{ 
   "example": true
@@ -31,7 +34,7 @@ const commonExtensions = [
   autocompletion(),
   lineNumbers(),
   lintGutter(),
-  oneDark,
+  jsonDark,
   EditorView.lineWrapping,
   EditorState.tabSize.of(2),
   syntaxHighlighting(oneDarkHighlightStyle),
@@ -65,12 +68,18 @@ export const JSONEditor = ({
   value,
   schema,
   onValueChange,
+  mode = "json4",
 }: {
   value: string
   onValueChange?: (newValue: string) => void
   schema?: Record<string, unknown>
+  mode?: "json5" | "json4"
 }) => {
-  const defaultExtensions = [...commonExtensions, jsonSchema(schema)]
+  const isJson5 = mode === "json5"
+  const defaultExtensions = [
+    ...commonExtensions,
+    isJson5 ? json5Schema(schema) : jsonSchema(schema),
+  ]
   const [isRendered, setIsRendered] = useState(false)
   const editorRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView>()
@@ -113,6 +122,22 @@ export const JSONEditor = ({
     }
     updateSchema(viewRef?.current, schema)
   }, [schema])
+
+  useEffect(() => {
+    if (!viewRef?.current) {
+      return
+    }
+    const doc = viewRef.current.state.doc
+    viewRef.current.dispatch({
+      changes: {
+        from: 0,
+        to: doc.length,
+        insert: isJson5
+          ? json5.stringify(JSON.parse(doc.toString()))
+          : JSON.stringify(json5.parse(viewRef.current.state.doc.toString())),
+      },
+    })
+  }, [isJson5])
 
   return (
     <div className="h-max w-full whitespace-break-spaces" ref={editorRef}></div>
