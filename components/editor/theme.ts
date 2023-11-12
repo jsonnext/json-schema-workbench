@@ -22,7 +22,7 @@ const chalky = "#e5c07b",
   tooltipBackground = "rgb(30 41 59 / 1)",
   selection = "#3E4451",
   cursor = "#528bff",
-  borderRadius = '10px';
+  borderRadius = '0px';
 
 //   --tw-bg-opacity: 1;
 //     background-color: rgb(30 41 59 / var(--tw-bg-opacity));

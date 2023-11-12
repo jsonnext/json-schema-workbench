@@ -1,3 +1,5 @@
+// custom!!!
+// based on a user suggestion in an issue
 "use client"
 
 import { CommandGroup, CommandItem, CommandList, CommandInput } from "@/components/ui/command"
@@ -115,6 +117,8 @@ export const AutoComplete = <T = {}>({
           className="w-full border-none p-2 text-base dark:bg-slate-800"
           role="combobox"
           aria-haspopup="listbox"
+          tabIndex={0}
+          autoFocus
         />
       </div>
       <div className="relative mt-1">
@@ -140,6 +144,7 @@ export const AutoComplete = <T = {}>({
                           event.preventDefault()
                           event.stopPropagation()
                         }}
+                        tabIndex={0}
                         onSelect={() => handleSelectOption(option)}
                         className={cn("flex w-full items-center gap-2", !isSelected ? "pl-8" : null)}
                 

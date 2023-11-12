@@ -27,12 +27,14 @@ export type SchemaResponse = {
 export const SchemaSelector = () => {
   const index = useMainStore((state) => state.index)
   const setSelectedSchema = useMainStore((state) => state.setSelectedSchema)
+  const selectedSchema = useMainStore((state) => state.selectedSchema)
   return (
     <AutoComplete<SchemaDetails>
       emptyMessage="SchemaStore.org schemas loading..."
       options={index ?? []}
       placeholder="choose a schema..."
       onValueChange={setSelectedSchema}
+      value={selectedSchema}
       Results={({ option, selected }) => (
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col ">

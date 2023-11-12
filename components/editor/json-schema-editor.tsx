@@ -3,14 +3,12 @@
 import { useEffect } from "react"
 import dynamic from "next/dynamic"
 import { useMainStore } from "@/store/main"
+import json5 from "json5"
+import { Droplets, MoreVertical } from "lucide-react"
 
 import { Icons } from "../icons"
 import { Button } from "../ui/button"
-
-const JSONEditor = dynamic(
-  async () => (await import("./json-editor")).JSONEditor,
-  { ssr: false }
-)
+import { EditorPane } from "./editor-pane"
 
 export const JSONSchemaEditor = () => {
   const schemaSpec = useMainStore((state) => state.schemaSpec)
@@ -19,28 +17,24 @@ export const JSONSchemaEditor = () => {
     state.loadIndex,
     state.setSchema,
   ])
+  const editorMode = useMainStore(
+    (state) => state.editors.schema.mode ?? state.userSettings.mode
+  )
 
   useEffect(() => {
     loadIndex()
   }, [loadIndex])
+
   return (
-    <>
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Schema</h3>
-        <div>
-          <Button variant="ghost">
-            <Icons.Hamburger className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
-      <JSONEditor
-        onValueChange={(val) => setSchema(JSON.parse(val))}
-        value={JSON.stringify(pristineSchema, null, 2)}
-        // json schema spec v? allow spec selection
-        schema={schemaSpec}
-        className="flex-1 overflow-auto"
-        height="100%"
-      />
-    </>
+    <EditorPane
+      editorKey="schema"
+      heading="Schema"
+      onValueChange={(val) => {
+        setSchema(json5.parse(val))
+      }}
+      value={pristineSchema}
+      // json schema spec v? allow spec selection
+      schema={schemaSpec}
+    />
   )
 }
