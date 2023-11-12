@@ -123,9 +123,9 @@ export const EditorMenu = ({
                   type="url"
                   disabled={false}
                   placeholder="https://example.com/schema.json"
-                  onChange={(e) => {
-                    console.log(e.target.value)
-                  }}
+                //   onChange={(e) => {
+                //     console.log(e.target.value)
+                //   }}
                 />
                 {imported ? (
                   <div className="flex items-center">

@@ -24,7 +24,6 @@ export const serialize = (
   editorMode: JSONModes,
   value?: Record<string, unknown>
 ): string => {
-    console.log('serializing')
   try {
     // @ts-expect-error
     return serializers[editorMode](value, null, 2)
