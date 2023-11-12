@@ -139,18 +139,13 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           },
         }))
         if (setting === "mode") {
-          if (editor === "testValue") {
-            set({
-              testValueString:
-                value === "json5"
-                  ? json5.stringify(JSON.parse(get().testValueString ?? "{}"), null, 2)
-                  : JSON.stringify(
-                      json5.parse(get().testValueString ?? "{}"),
-                      null,
-                      2
-                    ),
-            })
-          }
+          const editorString = get()[`${editor}String`] ?? "{}"
+          set({
+            [`${editor}String`]:
+              value === "json5"
+                ? json5.stringify(JSON.parse(editorString), null, 2)
+                : JSON.stringify(json5.parse(editorString), null, 2),
+          })
         }
       },
       setEditorMode: (editor, mode) => {
