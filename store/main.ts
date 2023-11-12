@@ -1,5 +1,6 @@
 import { EditorView } from "codemirror"
 import { JSONMode } from "codemirror-json-schema"
+import json5 from "json5"
 import { UseBoundStore, create } from "zustand"
 import {
   PersistOptions,
@@ -9,6 +10,7 @@ import {
 } from "zustand/middleware"
 
 import { JSONModes } from "@/types/editor"
+import { parse, serialize } from "@/lib/json"
 import { toast } from "@/components/ui/use-toast"
 import {
   SchemaResponse,
@@ -16,7 +18,6 @@ import {
 } from "@/components/schema/schema-selector"
 
 import { storage } from "./idb-store"
-import json5 from "json5"
 
 type JsonEditorState = {
   mode?: JSONModes
@@ -29,10 +30,11 @@ export type SchemaState = {
   selectedSchema?: SchemaSelectorValue
   // the actual schema object
   schema?: Record<string, unknown>
-  // the test data as string
-  testValue?: Record<string, unknown>
+  schemaString?: string
+
+  testValueString?: string
   // the initial schema value on change for the editor to set
-  pristineSchema?: Record<string, unknown>
+  // pristineSchema?: Record<string, unknown>
   schemaError?: string
   // an index of available schemas from SchemaStore.org
   index: SchemaSelectorValue[]
@@ -53,6 +55,7 @@ export type SchemaState = {
 export type SchemaActions = {
   setSelectedSchema: (selectedSchema: SchemaSelectorValue) => Promise<void>
   setSchema: (schema: Record<string, unknown>) => void
+  setSchemaString: (schema: string) => void
   clearSelectedSchema: () => void
   loadIndex: () => Promise<void>
   setEditorSetting: <T = string>(
@@ -60,11 +63,9 @@ export type SchemaActions = {
     setting: keyof JsonEditorState,
     value: T
   ) => void
-  setEditorMode: (
-    editor: keyof SchemaState["editors"],
-    mode: JSONModes
-  ) => void
-  setTestValue: (testValue: string) => void
+  setEditorMode: (editor: keyof SchemaState["editors"], mode: JSONModes) => void
+  setTestValueString: (testValue: string) => void
+  getMode: (editorKey?: keyof SchemaState["editors"]) => JSONModes
 }
 
 const persistOptions: PersistOptions<SchemaState & SchemaActions> = {
@@ -99,18 +100,35 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           selectedSchema: undefined,
           schema: undefined,
           schemaError: undefined,
-          pristineSchema: undefined,
         })
+      },
+      getMode: (editorKey?: keyof SchemaState["editors"]) => {
+        if (editorKey) {
+          return get().editors[editorKey].mode ?? get().userSettings.mode
+        }
+        return get().userSettings.mode
       },
       // don't set pristine schema here to avoid triggering updates
       setSchema: (schema: Record<string, unknown>) => {
-        set({ schema, schemaError: undefined })
+        set({
+          schema,
+          schemaError: undefined,
+          schemaString: serialize(get().getMode(), schema),
+        })
       },
-      setTestValue: (testValue) => {
-        set({ testValue: json5.parse(testValue) })
+      setSchemaString: (schema: string) => {
+        set({
+          schema: parse(get().getMode(), schema),
+          schemaString: schema,
+          schemaError: undefined,
+        })
+      },
+      setTestValueString: (testValue) => {
+        set({
+          testValueString: testValue,
+        })
       },
       setEditorSetting: (editor, setting, value) => {
-        console.log({ editor, setting, value })
         set((state) => ({
           editors: {
             ...state.editors,
@@ -120,6 +138,20 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             },
           },
         }))
+        if (setting === "mode") {
+          if (editor === "testValue") {
+            set({
+              testValueString:
+                value === "json5"
+                  ? json5.stringify(JSON.parse(get().testValueString ?? "{}"), null, 2)
+                  : JSON.stringify(
+                      json5.parse(get().testValueString ?? "{}"),
+                      null,
+                      2
+                    ),
+            })
+          }
+        }
       },
       setEditorMode: (editor, mode) => {
         set((state) => ({
@@ -132,7 +164,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           },
         }))
       },
-      setSelectedSchema: async (selectedSchema: SchemaSelectorValue) => {
+      setSelectedSchema: async (selectedSchema) => {
         try {
           set({ selectedSchema, schemaError: undefined })
           const data = await (
@@ -141,14 +173,15 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
                 url: selectedSchema.value,
               })}`
             )
-          ).json()
+          ).text()
           // though it appears we are setting schema state twice,
           // pristineSchema only changes on selecting a new schema
           set({
-            schema: data,
-            schemaError: data.error,
-            pristineSchema: data,
+            schema: parse(get().getMode(), data),
+            schemaString: data,
+            schemaError: undefined,
           })
+
           toast({
             title: "Schema loaded",
             description: selectedSchema.label,

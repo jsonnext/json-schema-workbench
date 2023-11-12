@@ -6,15 +6,16 @@ import { EditorPane } from "./editor-pane"
 
 export const JSONValueEditor = () => {
   const schema = useMainStore((state) => state.schema)
-  const testValue = useMainStore((state) => state.testValue)
-  const setTestValue = useMainStore((state) => state.setTestValue)
+  const setValueString = useMainStore((state) => state.setTestValueString)
+  const value = useMainStore((state) => state.testValueString)
+
   return (
     <EditorPane
       editorKey="testValue"
       heading={"Test Value"}
-      value={testValue ?? {}}
       schema={schema}
-      onValueChange={setTestValue}
+      setValueString={setValueString}
+      value={value}
     />
   )
 }

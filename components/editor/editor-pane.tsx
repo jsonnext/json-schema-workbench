@@ -1,16 +1,14 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 import { SchemaState } from "@/store/main"
 
-import { JSONEditorProps } from "./json-editor"
 import { EditorMenu } from "./menu"
 
-export interface EditorPane extends Omit<Omit<JSONEditorProps, "value">, "on"> {
+export interface EditorPane {
   heading: string
   editorKey: keyof SchemaState["editors"]
-  value?: Record<string, unknown>
+  schema?: Record<string, unknown>
+  value?: string
+  setValueString: (val: string) => void
 }
 
 const JSONEditor = dynamic(
@@ -19,19 +17,13 @@ const JSONEditor = dynamic(
 )
 
 export const EditorPane = ({
-  onValueChange,
-  value,
   schema,
   editorKey,
   heading,
+  value,
+  setValueString,
   ...props
 }: EditorPane) => {
-  // TODO: move both value states to store
-  const [editorValue, setEditorValue] = useState(value)
-
-  useEffect(() => {
-    setEditorValue(value)
-  }, [value])
   return (
     <>
       <div className="flex items-center justify-between">
@@ -40,17 +32,18 @@ export const EditorPane = ({
           heading={heading}
           editorKey={editorKey}
           value={value}
-          setValue={setEditorValue}
+          setValueString={setValueString}
         />
       </div>
       <JSONEditor
-        onValueChange={onValueChange}
-        value={editorValue}
+        onValueChange={setValueString}
+        // value={editorValue}
         // json schema spec v? allow spec selection
         schema={schema}
         editorKey={editorKey}
         className="flex-1 overflow-auto"
         height="100%"
+        value={value}
         {...props}
       />
     </>

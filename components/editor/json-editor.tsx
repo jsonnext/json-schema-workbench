@@ -17,10 +17,11 @@ import { jsonSchema, updateSchema } from "codemirror-json-schema"
 import { json5Schema } from "codemirror-json-schema/json5"
 import json5 from "json5"
 
+import { JSONModes } from "@/types/editor"
+import { serialize } from "@/lib/json"
+
 // import { debounce } from "@/lib/utils"
 import { jsonDark, jsonDarkTheme } from "./theme"
-import { JSONModes } from "@/types/editor"
-
 
 /**
  * none of these are required for json4 or 5
@@ -40,17 +41,17 @@ const languageExtensions = {
   json5: json5Schema,
 }
 
-export interface JSONEditorProps extends Omit<ReactCodeMirrorProps, "value"> {
-  value?: Record<string, unknown>
+export interface JSONEditorProps extends Omit<ReactCodeMirrorProps, 'value'> {
   onValueChange?: (newValue: string) => void
   schema?: Record<string, unknown>
   editorKey: keyof SchemaState["editors"]
+  value?: string
 }
 export const JSONEditor = ({
-  value,
   schema,
   onValueChange = () => {},
   editorKey,
+  value,
   ...rest
 }: JSONEditorProps) => {
   const editorMode = useMainStore(
@@ -68,15 +69,10 @@ export const JSONEditor = ({
     updateSchema(editorRef?.current.view, schema)
   }, [schema])
 
-  const stringValue = useMainStore((state) => {
-    const editorMode = state.editors[editorKey].mode ?? state.userSettings.mode
-    return editorMode === JSONModes.JSON4
-      ? JSON.stringify(value, null, 2)
-      : json5.stringify(value, null, 2)
-  })
+
   return (
     <CodeMirror
-      value={stringValue}
+      value={value ?? "{}"}
       extensions={[...commonExtensions, languageExtension]}
       onChange={onValueChange}
       theme={jsonDarkTheme}
