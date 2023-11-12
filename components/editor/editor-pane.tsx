@@ -26,7 +26,7 @@ export const EditorPane = ({
 }: EditorPane) => {
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between rounded-lg">
         <h3 className="text-md pl-2 font-medium w-full">{heading}</h3>
         <EditorMenu
           heading={heading}

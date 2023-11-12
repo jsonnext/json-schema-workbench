@@ -37,7 +37,7 @@ export type SchemaState = {
   // pristineSchema?: Record<string, unknown>
   schemaError?: string
   // an index of available schemas from SchemaStore.org
-  index: SchemaSelectorValue[] | undefined[]
+  index: SchemaSelectorValue[]
   indexError?: string
   // the base $schema spec for the current `schema`
   schemaSpec?: Record<string, unknown>
@@ -54,7 +54,10 @@ export type SchemaState = {
 }
 
 export type SchemaActions = {
-  setSelectedSchema: (selectedSchema: SchemaSelectorValue) => Promise<void>
+  setSelectedSchema: (
+    selectedSchema: Partial<SchemaSelectorValue> & { value: string }
+  ) => Promise<void>
+  setSelectedSchemaFromUrl: (url: string) => Promise<void>
   setSchema: (schema: Record<string, unknown>) => void
   setSchemaString: (schema: string) => void
   clearSelectedSchema: () => void
@@ -118,12 +121,12 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
         set({
           schema,
           schemaError: undefined,
-          schemaString: serialize(get().getMode(), schema),
+          schemaString: serialize(get().getMode("schema"), schema),
         })
       },
       setSchemaString: (schema: string) => {
         set({
-          schema: parse(get().getMode(), schema),
+          schema: parse(get().getMode("schema"), schema),
           schemaString: schema,
           schemaError: undefined,
         })
@@ -166,10 +169,12 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
       },
       fetchSchema: async (url: string) => {
         const schemas = get().schemas
+        // serialize them to the json4/5 the schema editor is configured for
+        const mode = get().getMode("schema")
         if (schemas[url]) {
           const schema = schemas[url]!
           return {
-            schemaString: serialize(JSONModes.JSON4, schema),
+            schemaString: serialize(mode, schema),
             schema,
           }
         }
@@ -180,16 +185,33 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             })}`
           )
         ).text()
-        const parsed = parse(JSONModes.JSON4, data)
+        const parsed = parse(mode, data)
         schemas[url] = parsed
         return { schemaString: data, schema: parsed }
       },
       setSelectedSchema: async (selectedSchema) => {
         try {
-          set({ selectedSchema, schemaError: undefined })
+          let selected = selectedSchema
           const { schemaString: data, schema } = await get().fetchSchema(
             selectedSchema.value
           )
+          if (!selectedSchema.label) {
+            selected = {
+              label:
+                schema.title ??
+                schema.description ??
+                (selectedSchema.value as string),
+              value: selectedSchema.value,
+              description: schema.title
+                ? (schema.description as string)
+                : undefined,
+            } as SchemaSelectorValue
+          }
+          set({
+            selectedSchema: selected as SchemaSelectorValue,
+            schemaError: undefined,
+          })
+
           // though it appears we are setting schema state twice,
           // pristineSchema only changes on selecting a new schema
           set({
@@ -229,6 +251,17 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             description: errMessage,
             variant: "destructive",
           })
+        }
+      },
+      setSelectedSchemaFromUrl: async (url) => {
+        const index = get().index
+        if (index) {
+          const selectedSchema = index.find((schema) => schema?.value === url)
+          if (selectedSchema) {
+            await get().setSelectedSchema(selectedSchema)
+          } else {
+            await get().setSelectedSchema({ value: url })
+          }
         }
       },
       // this should only need to be called on render

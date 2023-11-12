@@ -31,7 +31,7 @@ export const SchemaSelector = () => {
   const schemas = useMainStore((state) => state.schemas)
   return (
     <AutoComplete<SchemaDetails>
-      emptyMessage="SchemaStore.org schemas loading..."
+      emptyMessage="No schemas on SchemaStore.org matched your search."
       options={index ?? []}
       placeholder="choose a schema..."
       onValueChange={setSelectedSchema}

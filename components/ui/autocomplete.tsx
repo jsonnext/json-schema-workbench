@@ -114,7 +114,7 @@ export const AutoComplete = <T = {}>({
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full border-none p-2 text-base dark:bg-slate-800"
+          className="w-full border-none p-2 text-base dark:bg-slate-800 bg-slate-200"
           role="combobox"
           aria-haspopup="listbox"
           tabIndex={0}
@@ -123,7 +123,7 @@ export const AutoComplete = <T = {}>({
       </div>
       <div className="relative mt-1">
         {isOpen ? (
-          <div className="ease-in-outorigin-top-left absolute top-0 z-10 w-full rounded-xl bg-stone-50 outline-none transition duration-150 animate-in fade-in-0 zoom-in-95 dark:bg-slate-800">
+          <div className="ease-in-outorigin-top-left absolute top-0 z-10 w-full rounded-lg bg-stone-50 outline-none transition duration-150 animate-in fade-in-0 zoom-in-95 dark:bg-slate-800 ">
             <CommandList className="rounded-lg ring-1 ring-slate-200 dark:ring-slate-800">
               {isLoading ? (
                 <CommandPrimitive.Loading>
@@ -146,7 +146,7 @@ export const AutoComplete = <T = {}>({
                         }}
                         tabIndex={0}
                         onSelect={() => handleSelectOption(option)}
-                        className={cn("flex w-full items-center gap-2", !isSelected ? "pl-8" : null)}
+                        className={cn("flex w-full items-center gap-2 hover:dark:bg-slate-900", !isSelected ? "pl-8" : null)}
                 
                       >
                         {isSelected ? <Check className="w-4" /> : null}

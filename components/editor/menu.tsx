@@ -6,6 +6,7 @@ import json5 from "json5"
 import { Check, CheckIcon, MoreVertical } from "lucide-react"
 
 import { JSONModes } from "@/types/editor"
+import { serialize } from "@/lib/json"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -28,7 +29,6 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "../ui/dialog"
-import { serialize } from "@/lib/json"
 
 export interface EditorMenu {
   heading: string
@@ -45,7 +45,7 @@ export const EditorMenu = ({
   setValueString,
   menuPrefix,
   menuSuffix,
-  value
+  value,
 }: EditorMenu) => {
   const [imported, setImported] = useState<unknown>(undefined)
 
@@ -59,7 +59,11 @@ export const EditorMenu = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-none">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-none rounded-tr-lg"
+        >
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -70,10 +74,16 @@ export const EditorMenu = ({
             value={editorMode}
             onValueChange={(val) => setEditorSetting(editorKey, "mode", val)}
           >
-            <DropdownMenuRadioItem value={JSONModes.JSON4} className="cursor-pointer">
+            <DropdownMenuRadioItem
+              value={JSONModes.JSON4}
+              className="cursor-pointer"
+            >
               JSON4
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value={JSONModes.JSON5} className="cursor-pointer">
+            <DropdownMenuRadioItem
+              value={JSONModes.JSON5}
+              className="cursor-pointer"
+            >
               JSON5
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
@@ -87,10 +97,10 @@ export const EditorMenu = ({
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader className="text-lg">
-                  Import {heading} File...
+                  <div className="mb-2">Import {heading} File...</div>
+                  <Separator className="h-[1px] bg-ring" />
                 </DialogHeader>
                 <div>
-                  <Separator className="h-[1px] bg-ring" />
                   <Label htmlFor="importFile">From your device</Label>
                   <Input
                     name="importFile"
@@ -105,7 +115,7 @@ export const EditorMenu = ({
                         const fileText = await file.text()
                         if (file.type.includes(JSONModes.JSON5)) {
                           setImported(json5.parse(fileText))
-                        } else if (file.type.includes(JSONModes.JSON4)) {
+                        } else if (file.type.includes('json')) {
                           setImported(JSON.parse(fileText))
                         }
 
@@ -115,30 +125,36 @@ export const EditorMenu = ({
                       }
                     }}
                   />
+
+                  <Label htmlFor={"urlImport"}>From a URL</Label>
+                  <Input
+                    id="urlImport"
+                    name="urlImport"
+                    type="url"
+                    disabled={false}
+                    placeholder="https://example.com/schema.json"
+                    //   onChange={(e) => {
+                    //     console.log(e.target.value)
+                    //   }}
+                  />
+                  {imported ? (
+                    <div className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-2" />
+                      This file can be imported{" "}
+                    </div>
+                  ) : null}
                 </div>
-                <Label htmlFor={"urlImport"}>From a URL</Label>
-                <Input
-                  id="urlImport"
-                  name="urlImport"
-                  type="url"
-                  disabled={false}
-                  placeholder="https://example.com/schema.json"
-                //   onChange={(e) => {
-                //     console.log(e.target.value)
-                //   }}
-                />
-                {imported ? (
-                  <div className="flex items-center">
-                    <Check className="h-5 w-5 text-green-500 mr-2" />
-                    This file can be imported{" "}
-                  </div>
-                ) : null}
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button
                       onClick={(e) => {
                         // e.stopPropagation()
-                        setValueString(serialize(editorMode, imported as Record<string, unknown>))
+                        setValueString(
+                          serialize(
+                            editorMode,
+                            imported as Record<string, unknown>
+                          )
+                        )
                         setImported(undefined)
                       }}
                       type="submit"
@@ -165,7 +181,9 @@ export const EditorMenu = ({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => value && setValueString(value)}>Format</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => value && setValueString(value)}>
+            Format
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         {menuSuffix && menuSuffix}
       </DropdownMenuContent>
