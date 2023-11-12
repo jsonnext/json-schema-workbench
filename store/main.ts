@@ -37,7 +37,7 @@ export type SchemaState = {
   // pristineSchema?: Record<string, unknown>
   schemaError?: string
   // an index of available schemas from SchemaStore.org
-  index: SchemaSelectorValue[]
+  index: SchemaSelectorValue[] | undefined[]
   indexError?: string
   // the base $schema spec for the current `schema`
   schemaSpec?: Record<string, unknown>
@@ -50,6 +50,7 @@ export type SchemaState = {
     schema: JsonEditorState
     testValue: JsonEditorState
   }
+  schemas: Record<string, Record<string, unknown>>
 }
 
 export type SchemaActions = {
@@ -66,15 +67,17 @@ export type SchemaActions = {
   setEditorMode: (editor: keyof SchemaState["editors"], mode: JSONModes) => void
   setTestValueString: (testValue: string) => void
   getMode: (editorKey?: keyof SchemaState["editors"]) => JSONModes
+  fetchSchema: (
+    url: string
+  ) => Promise<{ schemaString: string; schema: Record<string, unknown> }>
 }
 
 const persistOptions: PersistOptions<SchemaState & SchemaActions> = {
-  name: "jsonWorkbench",
+  name: "jsonWorkBench",
   storage: createJSONStorage(() => storage),
 }
 
 const initialState = {
-  index: [],
   userSettings: {
     // theme: "system",
     mode: JSONModes.JSON4,
@@ -87,6 +90,7 @@ const initialState = {
     schema: {},
     testValue: {},
   },
+  schemas: {},
 }
 
 export const useMainStore = create<SchemaState & SchemaActions>()<
@@ -95,6 +99,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
   persist(
     devtools((set, get) => ({
       ...initialState,
+      index: [],
       clearSelectedSchema: () => {
         set({
           selectedSchema: undefined,
@@ -159,20 +164,36 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           },
         }))
       },
+      fetchSchema: async (url: string) => {
+        const schemas = get().schemas
+        if (schemas[url]) {
+          const schema = schemas[url]!
+          return {
+            schemaString: serialize(JSONModes.JSON4, schema),
+            schema,
+          }
+        }
+        const data = await (
+          await fetch(
+            `/api/schema?${new URLSearchParams({
+              url,
+            })}`
+          )
+        ).text()
+        const parsed = parse(JSONModes.JSON4, data)
+        schemas[url] = parsed
+        return { schemaString: data, schema: parsed }
+      },
       setSelectedSchema: async (selectedSchema) => {
         try {
           set({ selectedSchema, schemaError: undefined })
-          const data = await (
-            await fetch(
-              `/api/schema?${new URLSearchParams({
-                url: selectedSchema.value,
-              })}`
-            )
-          ).text()
+          const { schemaString: data, schema } = await get().fetchSchema(
+            selectedSchema.value
+          )
           // though it appears we are setting schema state twice,
           // pristineSchema only changes on selecting a new schema
           set({
-            schema: parse(get().getMode(), data),
+            schema: schema,
             schemaString: data,
             schemaError: undefined,
           })
@@ -197,8 +218,8 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             schema && schema["$schema"]
               ? (schema["$schema"] as string)
               : "https://json-schema.org/draft/2020-12/schema"
-          const data = await (await fetch(schemaUrl)).json()
-          set({ schemaSpec: data })
+          const { schema: schemaSpec } = await get().fetchSchema(schemaUrl)
+          set({ schemaSpec })
         } catch (err) {
           // @ts-expect-error
           const errMessage = err?.message || err
@@ -210,7 +231,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           })
         }
       },
-      // this should only need to be called on render, and ideally be persisted
+      // this should only need to be called on render
       loadIndex: async () => {
         try {
           if (!get().index?.length) {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useMainStore } from "@/store/main"
-import { Check } from "lucide-react"
+import { Check, Save } from "lucide-react"
 
 import { AutoComplete } from "@/components/ui/autocomplete"
 
@@ -28,6 +28,7 @@ export const SchemaSelector = () => {
   const index = useMainStore((state) => state.index)
   const setSelectedSchema = useMainStore((state) => state.setSelectedSchema)
   const selectedSchema = useMainStore((state) => state.selectedSchema)
+  const schemas = useMainStore((state) => state.schemas)
   return (
     <AutoComplete<SchemaDetails>
       emptyMessage="SchemaStore.org schemas loading..."
@@ -37,6 +38,7 @@ export const SchemaSelector = () => {
       value={selectedSchema}
       Results={({ option, selected }) => (
         <div className="flex w-full items-center justify-between">
+          {selected && <Check className="h-5 w-5 text-green-500" />}
           <div className="flex flex-col ">
             <span className="font-medium">{option.label}</span>
             {option.description && (
@@ -57,7 +59,7 @@ export const SchemaSelector = () => {
               </span>
             )}
           </div>
-          {selected && <Check className="h-5 w-5 text-green-500" />}
+          {schemas[option.value] && <Save className="h-5 w-5 text-slate-600 dark:text-slate-300"/>}
         </div>
       )}
     />
