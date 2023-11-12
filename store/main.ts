@@ -16,6 +16,7 @@ import {
 } from "@/components/schema/schema-selector"
 
 import { storage } from "./idb-store"
+import json5 from "json5"
 
 type JsonEditorState = {
   mode?: JSONModes
@@ -28,6 +29,8 @@ export type SchemaState = {
   selectedSchema?: SchemaSelectorValue
   // the actual schema object
   schema?: Record<string, unknown>
+  // the test data as string
+  testValue?: Record<string, unknown>
   // the initial schema value on change for the editor to set
   pristineSchema?: Record<string, unknown>
   schemaError?: string
@@ -43,15 +46,15 @@ export type SchemaState = {
   // editors state
   editors: {
     schema: JsonEditorState
-    value: JsonEditorState
+    testValue: JsonEditorState
   }
 }
 
 export type SchemaActions = {
-  setSelectedSchema: (selectedSchema: SchemaSelectorValue) => void
+  setSelectedSchema: (selectedSchema: SchemaSelectorValue) => Promise<void>
   setSchema: (schema: Record<string, unknown>) => void
   clearSelectedSchema: () => void
-  loadIndex: () => void
+  loadIndex: () => Promise<void>
   setEditorSetting: <T = string>(
     editor: keyof SchemaState["editors"],
     setting: keyof JsonEditorState,
@@ -61,6 +64,7 @@ export type SchemaActions = {
     editor: keyof SchemaState["editors"],
     mode: JSONModes
   ) => void
+  setTestValue: (testValue: string) => void
 }
 
 const persistOptions: PersistOptions<SchemaState & SchemaActions> = {
@@ -80,7 +84,7 @@ const initialState = {
   },
   editors: {
     schema: {},
-    value: {},
+    testValue: {},
   },
 }
 
@@ -98,10 +102,15 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           pristineSchema: undefined,
         })
       },
+      // don't set pristine schema here to avoid triggering updates
       setSchema: (schema: Record<string, unknown>) => {
-        set({ schema })
+        set({ schema, schemaError: undefined })
+      },
+      setTestValue: (testValue) => {
+        set({ testValue: json5.parse(testValue) })
       },
       setEditorSetting: (editor, setting, value) => {
+        console.log({ editor, setting, value })
         set((state) => ({
           editors: {
             ...state.editors,
@@ -176,7 +185,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
       // this should only need to be called on render, and ideally be persisted
       loadIndex: async () => {
         try {
-          if (get().index?.length > 0) {
+          if (!get().index?.length) {
             const indexPayload: SchemaResponse = await (
               await fetch("/api/schemas")
             ).json()

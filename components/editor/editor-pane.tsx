@@ -1,36 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
-import { SchemaState, useMainStore } from "@/store/main"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { SchemaState } from "@/store/main"
 
-
-import { MoreVertical } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-} from "../ui/dialog"
 import { JSONEditorProps } from "./json-editor"
+import { EditorMenu } from "./menu"
 
 export interface EditorPane extends Omit<Omit<JSONEditorProps, "value">, "on"> {
   heading: string
@@ -51,85 +26,22 @@ export const EditorPane = ({
   heading,
   ...props
 }: EditorPane) => {
+  // TODO: move both value states to store
   const [editorValue, setEditorValue] = useState(value)
-  const editorMode = useMainStore(
-    (state) => state.editors[editorKey].mode ?? state.userSettings.mode
-  )
-  const setEditorSetting = useMainStore((state) => state.setEditorSetting)
 
+  useEffect(() => {
+    setEditorValue(value)
+  }, [value])
   return (
     <>
-      <div className="flex items-center justify-between border">
-        <h3 className="text-md pl-2 font-medium">{heading}</h3>
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="rounded-none border-l">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuGroup>
-                <DropdownMenuRadioGroup
-                  value={editorMode}
-                  onValueChange={(val) =>
-                    setEditorSetting(editorKey, "mode", val)
-                  }
-                >
-                  <DropdownMenuRadioItem value={"json4"}>
-                    JSON4
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value={"json5"}>
-                    JSON5
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-                <Dialog>
-                  <DialogTrigger>Import</DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader  className="text-lg">Import {heading} File...</DialogHeader>
-                    <Separator className="bg-ring h-[1px]" />
-                    <Label>From your device</Label>
-                    <Input
-                      type="file"
-                      multiple={false}
-                      accept=".json,.json5,.cson,.yml,.yaml,.csv"
-                      disabled={false}
-                      onChange={(e) => {
-                        console.log(e.target.files)
-                      }}
-                      autoFocus
-                    />
-                    <Label htmlFor={"fileImport"}>From a URL</Label>
-                    <Input
-                      id="fileImport"
-                      name="fileImport"
-                      type="url"
-                      disabled={false}
-                      placeholder="https://example.com/schema.json"
-                      onChange={(e) => {
-                        console.log(e.target.value)
-                      }}
-                    />
-                    <div>
-                        <Button>
-                            Import
-                        </Button>
-                        <Button variant="ghost" className="mr-2">
-                            Cancel
-                        </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem>Export</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div className="flex items-center justify-between">
+        <h3 className="text-md pl-2 font-medium w-full">{heading}</h3>
+        <EditorMenu
+          heading={heading}
+          editorKey={editorKey}
+          value={value}
+          setValue={setEditorValue}
+        />
       </div>
       <JSONEditor
         onValueChange={onValueChange}

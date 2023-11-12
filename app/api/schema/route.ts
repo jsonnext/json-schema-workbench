@@ -12,19 +12,21 @@ async function getSchema(url: string) {
 }
 
 export async function GET(request: Request) {
-  const {searchParams} = new URL(request.url);
+  const { searchParams } = new URL(request.url)
 
   try {
     const url = searchParams.get("url")
     if (!url) {
-      
       return new Response("No schema key provided", {
         status: 400,
       })
     }
     const schema = await getSchema(url)
     return new Response(schema, {
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        // "cache-control": "s-maxage=1440000",
+      },
     })
   } catch (e) {
     return new Response(

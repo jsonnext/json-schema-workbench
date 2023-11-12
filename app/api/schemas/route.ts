@@ -13,6 +13,9 @@ async function getSchemas() {
 
 export async function GET(request: Request) {
   return new Response(await getSchemas(), {
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      // "cache-control": "s-maxage=1440000",
+    },
   })
 }
