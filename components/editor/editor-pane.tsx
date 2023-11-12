@@ -3,29 +3,33 @@
 import { useState } from "react"
 import dynamic from "next/dynamic"
 import { SchemaState, useMainStore } from "@/store/main"
-import json5 from "json5"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
+
+
 import { MoreVertical } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Command, CommandInput } from "@/components/ui/command"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
+
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
+
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 
-import { Input } from "../ui/input"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "../ui/dialog"
 import { JSONEditorProps } from "./json-editor"
 
 export interface EditorPane extends Omit<Omit<JSONEditorProps, "value">, "on"> {
@@ -81,53 +85,47 @@ export const EditorPane = ({
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  {/* <UserPlus className="mr-2 h-4 w-4" /> */}
-                  <span>Import</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuItem>
-                      {/* <Mail className="mr-2 h-4 w-4" /> */}
-                      <div className="mr-2">From File</div>
-                      <div>
-                        <Input
-                          type="file"
-                          multiple={false}
-                          id="fromFile"
-                          accept=".json,.json5,,yaml,.yml,.csv"
-                          onSelect={() => {
-                            const file = document.getElementById("fromFile")
-                            if (file) {
-                              const reader = new FileReader()
-                              reader.onload = (e) => {
-                                if (!e.target?.result) return
-                                if (isArrayBuffer(e.target.result)) {
-                                  const contents = new TextDecoder(
-                                    "utf-8"
-                                  ).decode(e.target.result)
-                                  if (contents) {
-                                    setEditorValue(JSON.parse(contents))
-                                  }
-                                  return
-                                }
 
-                                reader.readAsText(file.files[0])
-                              }
-                            }
-                          }}
-                        />
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      {/* <MessageSquare className="mr-2 h-4 w-4" /> */}
-                      <span>From URL</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
+              <DropdownMenuItem onClick={(e) => e.preventDefault()}>
+                <Dialog>
+                  <DialogTrigger>Import</DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader  className="text-lg">Import {heading} File...</DialogHeader>
+                    <Separator className="bg-ring h-[1px]" />
+                    <Label>From your device</Label>
+                    <Input
+                      type="file"
+                      multiple={false}
+                      accept=".json,.json5,.cson,.yml,.yaml,.csv"
+                      disabled={false}
+                      onChange={(e) => {
+                        console.log(e.target.files)
+                      }}
+                      autoFocus
+                    />
+                    <Label htmlFor={"fileImport"}>From a URL</Label>
+                    <Input
+                      id="fileImport"
+                      name="fileImport"
+                      type="url"
+                      disabled={false}
+                      placeholder="https://example.com/schema.json"
+                      onChange={(e) => {
+                        console.log(e.target.value)
+                      }}
+                    />
+                    <div>
+                        <Button>
+                            Import
+                        </Button>
+                        <Button variant="ghost" className="mr-2">
+                            Cancel
+                        </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </DropdownMenuItem>
+
               <DropdownMenuItem>Export</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
