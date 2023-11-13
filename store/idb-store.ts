@@ -1,6 +1,6 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage, StateStorage } from 'zustand/middleware'
-import { get, set, del } from 'idb-keyval' // can use anything: IndexedDB, Ionic Storage, etc.
+import { del, get, set } from "idb-keyval"
+import { StateStorage } from "zustand/middleware"
+
 
 // Custom storage object
 export const storage: StateStorage = {
