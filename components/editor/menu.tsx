@@ -13,6 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
@@ -27,6 +28,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogPortal,
   DialogTrigger,
 } from "../ui/dialog"
 
@@ -37,6 +39,7 @@ export interface EditorMenu {
   setValueString: (val: string) => void
   menuPrefix?: React.ReactNode
   menuSuffix?: React.ReactNode
+  onOpenImportDialog?: () => void
 }
 
 export const EditorMenu = ({
@@ -46,8 +49,10 @@ export const EditorMenu = ({
   menuPrefix,
   menuSuffix,
   value,
+  onOpenImportDialog,
 }: EditorMenu) => {
   const [imported, setImported] = useState<unknown>(undefined)
+  const [importUrl, setImportUrl] = useState('');
 
   const setEditorSetting = useMainStore((state) => state.setEditorSetting)
 
@@ -67,126 +72,42 @@ export const EditorMenu = ({
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {menuPrefix && menuPrefix}
-        <DropdownMenuGroup>
-          <DropdownMenuRadioGroup
-            value={editorMode}
-            onValueChange={(val) => setEditorSetting(editorKey, "mode", val)}
-          >
-            <DropdownMenuRadioItem
-              value={JSONModes.JSON4}
-              className="cursor-pointer"
+      <DropdownMenuPortal>
+        <DropdownMenuContent>
+          {menuPrefix && menuPrefix}
+          <DropdownMenuGroup>
+            <DropdownMenuRadioGroup
+              value={editorMode}
+              onValueChange={(val) => setEditorSetting(editorKey, "mode", val)}
             >
-              JSON4
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value={JSONModes.JSON5}
-              className="cursor-pointer"
-            >
-              JSON5
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-            <Dialog>
-              <DialogTrigger className="w-full text-left">
-                <span>Import</span>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader className="text-lg">
-                  <div className="mb-2">Import {heading} File...</div>
-                  <Separator className="h-[1px] bg-ring" />
-                </DialogHeader>
-                <div>
-                  <Label htmlFor="importFile">From your device</Label>
-                  <Input
-                    name="importFile"
-                    type="file"
-                    accept=".json,.yml,.yaml,.json5,.jsonc,.json5c,.json-ld"
-                    // to undo the above stopPropogation() within this scope
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={async (e) => {
-                      // TODO: move to zustand
-                      const file = e?.target?.files?.[0]
-                      if (file) {
-                        const fileText = await file.text()
-                        if (file.type.includes(JSONModes.JSON5)) {
-                          setImported(json5.parse(fileText))
-                        } else if (file.type.includes('json')) {
-                          setImported(JSON.parse(fileText))
-                        }
-
-                        if (file.type.includes("yaml")) {
-                          setImported(parseYaml(fileText))
-                        }
-                      }
-                    }}
-                  />
-
-                  <Label htmlFor={"urlImport"}>From a URL</Label>
-                  <Input
-                    id="urlImport"
-                    name="urlImport"
-                    type="url"
-                    disabled={false}
-                    placeholder="https://example.com/schema.json"
-                    //   onChange={(e) => {
-                    //     console.log(e.target.value)
-                    //   }}
-                  />
-                  {imported ? (
-                    <div className="flex items-center">
-                      <Check className="h-5 w-5 text-green-500 mr-2" />
-                      This file can be imported{" "}
-                    </div>
-                  ) : null}
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button
-                      onClick={(e) => {
-                        // e.stopPropagation()
-                        setValueString(
-                          serialize(
-                            editorMode,
-                            imported as Record<string, unknown>
-                          )
-                        )
-                        setImported(undefined)
-                      }}
-                      type="submit"
-                      disabled={!imported}
-                    >
-                      Import
-                    </Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button
-                      variant="ghost"
-                      className="mr-2"
-                      onClick={() => setImported(undefined)}
-                    >
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem>Export</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => value && setValueString(value)}>
-            Format
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        {menuSuffix && menuSuffix}
-      </DropdownMenuContent>
+              <DropdownMenuRadioItem
+                value={JSONModes.JSON4}
+                className="cursor-pointer"
+              >
+                JSON4
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem
+                value={JSONModes.JSON5}
+                className="cursor-pointer"
+              >
+                JSON5
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={onOpenImportDialog} className='cursor-pointer'>Import</DropdownMenuItem>
+            <DropdownMenuItem>Export</DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => value && setValueString(value)}>
+              Format
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          {menuSuffix && menuSuffix}
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenu>
   )
 }
