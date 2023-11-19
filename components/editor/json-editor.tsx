@@ -21,7 +21,8 @@ import { JSONModes } from "@/types/editor"
 import { serialize } from "@/lib/json"
 
 // import { debounce } from "@/lib/utils"
-import { jsonDark, jsonDarkTheme } from "./theme"
+import { jsonDark, jsonDarkTheme, jsonLight, jsonLightTheme, lightHighlightStyle } from "./theme"
+import { useTheme } from 'next-themes'
 
 /**
  * none of these are required for json4 or 5
@@ -30,10 +31,8 @@ import { jsonDark, jsonDarkTheme } from "./theme"
 const commonExtensions = [
   history(),
   autocompletion(),
-  jsonDark,
   EditorView.lineWrapping,
   EditorState.tabSize.of(2),
-  syntaxHighlighting(oneDarkHighlightStyle),
 ]
 
 const languageExtensions = {
@@ -59,7 +58,10 @@ export const JSONEditor = ({
       state.editors[editorKey as keyof SchemaState["editors"]].mode ??
       state.userSettings.mode
   )
+  const {theme} = useTheme();
   const languageExtension = languageExtensions[editorMode](schema)
+  const themeExtensions = theme === 'light' ? jsonLight : jsonDark;
+
   const editorRef = useRef<ReactCodeMirrorRef>(null)
 
   useEffect(() => {
@@ -73,9 +75,9 @@ export const JSONEditor = ({
   return (
     <CodeMirror
       value={value ?? "{}"}
-      extensions={[...commonExtensions, languageExtension]}
+      extensions={[...commonExtensions, themeExtensions, languageExtension]}
       onChange={onValueChange}
-      theme={jsonDarkTheme}
+      theme={theme === 'light' ? jsonLightTheme : jsonDarkTheme}
       ref={editorRef}
       contextMenu="true"
       {...rest}
