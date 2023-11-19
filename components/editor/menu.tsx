@@ -40,6 +40,7 @@ export interface EditorMenu {
   menuPrefix?: React.ReactNode
   menuSuffix?: React.ReactNode
   onOpenImportDialog?: () => void
+  onFormat?: () => void
 }
 
 export const EditorMenu = ({
@@ -50,10 +51,8 @@ export const EditorMenu = ({
   menuSuffix,
   value,
   onOpenImportDialog,
+  onFormat,
 }: EditorMenu) => {
-  const [imported, setImported] = useState<unknown>(undefined)
-  const [importUrl, setImportUrl] = useState('');
-
   const setEditorSetting = useMainStore((state) => state.setEditorSetting)
 
   const editorMode = useMainStore(
@@ -101,7 +100,7 @@ export const EditorMenu = ({
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => value && setValueString(value)}>
+            <DropdownMenuItem onClick={() => onFormat?.()} className='cursor-pointer'>
               Format
             </DropdownMenuItem>
           </DropdownMenuGroup>
