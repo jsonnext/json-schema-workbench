@@ -1,6 +1,10 @@
+import { useState } from "react"
 import dynamic from "next/dynamic"
-import { SchemaState } from "@/store/main"
+import { SchemaState, useMainStore } from "@/store/main"
 
+import { parse, serialize } from "@/lib/json"
+
+import { ImportDialog } from "./import-dialog"
 import { EditorMenu } from "./menu"
 
 export interface EditorPane {
@@ -24,15 +28,25 @@ export const EditorPane = ({
   setValueString,
   ...props
 }: EditorPane) => {
+  const [openImportDialog, setOpenImportDialog] = useState(false)
+  const editorMode = useMainStore(
+    (state) => state.editors[editorKey].mode ?? state.userSettings.mode
+  )
   return (
     <>
       <div className="flex items-center justify-between rounded-lg">
-        <h3 className="text-md pl-2 font-medium w-full">{heading}</h3>
+        <h3 className="text-md w-full pl-2 font-medium">{heading}</h3>
         <EditorMenu
           heading={heading}
           editorKey={editorKey}
           value={value}
           setValueString={setValueString}
+          onOpenImportDialog={() => setOpenImportDialog(true)}
+          onFormat={() => {
+            setValueString(
+              serialize(editorMode, parse(editorMode, value ?? ""))
+            )
+          }}
         />
       </div>
       <JSONEditor
@@ -45,6 +59,13 @@ export const EditorPane = ({
         height="100%"
         value={value}
         {...props}
+      />
+      <ImportDialog
+        heading={heading}
+        setValueString={setValueString}
+        editorKey={editorKey}
+        open={openImportDialog}
+        onOpenChange={setOpenImportDialog}
       />
     </>
   )

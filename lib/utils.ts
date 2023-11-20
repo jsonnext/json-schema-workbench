@@ -27,3 +27,12 @@ export function debounce<A = unknown, R = void>(
 
   return [debouncedFunc, teardown];
 }
+
+export const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
