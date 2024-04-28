@@ -1,10 +1,9 @@
 "use client"
 
-import dynamic from "next/dynamic"
 import { SchemaState, useMainStore } from "@/store/main"
+
 // import { JsonForms } from "@jsonforms/react"
 // import { vanillaCells, vanillaRenderers, vanillaStyles } from "@jsonforms/vanilla-renderers"
-import { Provider as MosaicProvider } from "@stoplight/mosaic"
 
 import { JSONModes } from "@/types/editor"
 import { parse, serialize } from "@/lib/json"
@@ -58,9 +57,7 @@ export const EditorPane = ({
       </div>
       <div className="flex-1-1 flex h-full w-full overflow-auto">
         {value && editorKey === "schema" && editorView === "viewer" ? (
-          <MosaicProvider>
-            <SchemaViewer />
-          </MosaicProvider>
+          <SchemaViewer />
         ) : null}
         {/* {editorKey === "testValue" && editorView === "viewer" ? (
           <JsonForms

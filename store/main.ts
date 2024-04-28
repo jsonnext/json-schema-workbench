@@ -1,6 +1,5 @@
 import { EditorView } from "codemirror"
 import json5 from "json5"
-import { JSONSchemaFaker } from "json-schema-faker"
 import { UseBoundStore, create,  } from "zustand"
 import {
   PersistOptions,
@@ -137,15 +136,29 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
         return get().userSettings.mode
       },
       fakeValue: async () => {
-        const value = await JSONSchemaFaker.resolve(get().schema!)
-        if (value) {
-          set({
-            testValueString: serialize(
-              get().getMode("testValue"),
-              value as Record<string, unknown>
-            ),
+        try {
+          const { JSONSchemaFaker} = await import('json-schema-faker')
+          const value = await JSONSchemaFaker.resolve(get().schema!)
+          if (value) {
+            set({
+              testValueString: serialize(
+                get().getMode("testValue"),
+                value as Record<string, unknown>
+              ),
+            })
+          }
+        }
+        catch (err) {
+          // @ts-expect-error
+          const errMessage = err?.message || err
+          set({ schemaError: errMessage })
+          toast({
+            title: "Error generating fake data",
+            description: errMessage,
+            variant: "destructive",
           })
         }
+        
       },
       // don't set pristine schema here to avoid triggering updates
       setSchema: (schema: Record<string, unknown>) => {
