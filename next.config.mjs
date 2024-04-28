@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  transpilePackages: ['@stoplight/json-schema-viewer', '@stoplight/json', 'jsonc-parser'],
+  // reactStrictMode: true,
   experimental: {
     // appDir: true,
   },

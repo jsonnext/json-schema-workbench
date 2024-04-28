@@ -1,7 +1,12 @@
+import dynamic from "next/dynamic"
 import { useMainStore } from "@/store/main"
-import { JsonSchemaViewer } from "@stoplight/json-schema-viewer"
 import { injectStyles } from "@stoplight/mosaic"
 import { useTheme } from "next-themes"
+
+const JsonSchemaViewer = dynamic(
+  async () => (await import("@stoplight/json-schema-viewer")).JsonSchemaViewer,
+  { ssr: false }
+)
 
 export const SchemaViewer = () => {
   const theme = useTheme()

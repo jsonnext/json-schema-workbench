@@ -1,5 +1,4 @@
-'use client'
-import { useBreakpoint } from "use-breakpoint"
+"use client"
 
 import {
   ResizableHandle,
@@ -20,12 +19,12 @@ export default function IndexPage({
   return (
     <div className="h-[92vh] w-full ">
       <ResizablePanelGroup
-        direction={'horizontal'}
+        direction={"horizontal"}
         className="grid  w-full gap-2 pb-8 md:grid-cols-2"
       >
         <ResizablePanel
           id="json-schema-editor"
-          className="full flex-col overflow-scroll md:h-full md:w-[50vw] md:min-w-[30vw]"
+          className="full flex w-max flex-col overflow-scroll md:h-full md:w-[50vw] md:min-w-[30vw]"
         >
           <JSONSchemaEditor url={searchParams.url} />
         </ResizablePanel>
