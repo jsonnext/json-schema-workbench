@@ -138,7 +138,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             sortProperties: true,
             replaceEmptyByRandomValue: true,
             reuseProperties: true,
-            optionalsProbability: .9,
+            optionalsProbability: 0.9,
             failOnInvalidFormat: false,
             failOnInvalidTypes: false,
             renderDescription: true,
@@ -351,14 +351,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           set({ schemaError: e.message })
         }
       },
-      setDirectSelectedSchema: async (schema) => {
-        return {
-          selectedSchema: {
-            label: schema.title ?? schema.description ?? "imported schema",
-          },
-          schema
-        }
-      },
+
       setSelectedSchema: async (selectedSchema) => {
         try {
           let selected = selectedSchema
