@@ -16,13 +16,13 @@ import { parse, serialize } from "@/lib/json"
 // )
 
 import { SchemaViewer } from "./schema-viewer"
-// import { JSONEditor } from "./json-editor"
+import { JSONEditor } from "./json-editor"
 import { EditorMenu } from "./menu"
 
-const JSONEditor = dynamic(
-  async () => (await import("./json-editor")).JSONEditor,
-  { ssr: false }
-)
+// const JSONEditor = dynamic(
+//   async () => (await import("./json-editor")).JSONEditor,
+//   { ssr: false }
+// )
 
 export interface EditorPane {
   heading: string

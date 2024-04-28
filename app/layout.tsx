@@ -48,10 +48,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
             href="https://kit.fontawesome.com"
             crossOrigin="anonymous"
           />
-          <script
+          {/* <script
             src="https://kit.fontawesome.com/1e1f25269b.js"
             crossOrigin="anonymous"
-          ></script>
+          ></script> */}
 
         </head>
         <body
