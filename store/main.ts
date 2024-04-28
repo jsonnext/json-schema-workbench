@@ -1,3 +1,5 @@
+'use client'
+
 import { EditorView } from "codemirror"
 import json5 from "json5"
 import { UseBoundStore, create } from "zustand"
