@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { EditorView } from "codemirror"
 import json5 from "json5"
@@ -17,10 +17,6 @@ import {
   SchemaResponse,
   SchemaSelectorValue,
 } from "@/components/schema/schema-selector"
-
-  
-import { storage } from "./idb-store"
-import dynamic from "next/dynamic"
 
 type EditorViewMode = "editor" | "viewer" | "form"
 
@@ -82,14 +78,6 @@ export type SchemaActions = {
   ) => Promise<
     { schemaString: string; schema: Record<string, unknown> } | undefined
   >
-}
-
-let persistOptions: {
-  name: string
-  storage?: PersistOptions<SchemaState>["storage"]
-} = {
-  name: "jsonWorkBench",
-  storage: createJSONStorage(() => storage),
 }
 
 const initialState = {
@@ -476,6 +464,12 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
         }
       },
     })),
-    persistOptions
+    async () => {
+      const { storage } = await import("./idb-store")
+      return {
+        name: "jsonWorkBench",
+        storage: createJSONStorage(() => storage),
+      }
+    }
   )
 )
