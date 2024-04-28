@@ -17,25 +17,26 @@ export default function IndexPage({
 
   // const { breakpoint } = useBreakpoint(BREAKPOINTS, "desktop")
   return (
-    <div className="h-[92vh] w-full ">
+    <div className="h-[92dvh] w-full ">
       <ResizablePanelGroup
         direction={"horizontal"}
         className="grid  w-full gap-2 pb-8 md:grid-cols-2"
       >
         <ResizablePanel
           id="json-schema-editor"
-          className="full flex w-max flex-col overflow-scroll md:h-full md:w-[50vw] md:min-w-[30vw]"
+          className="full flex w-max flex-col overflow-scroll md:h-full md:w-[50vw] md:min-w-[300px]"
         >
           <JSONSchemaEditor url={searchParams.url} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel
           id="json-value-editor"
-          className="flex h-[50hw] flex-col overflow-scroll md:h-full "
+          className="flex h-[50hw] flex-col overflow-scroll md:h-full md:min-w-[300px]"
         >
           <JSONValueEditor />
         </ResizablePanel>
       </ResizablePanelGroup>
+      
     </div>
   )
 }

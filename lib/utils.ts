@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export function debounce<A = unknown, R = void>(
   fn: (args: A) => R,
   ms: number
-): [(args: A) => Promise<R>, () => void] {
+): [(args: A) => Promise<R>, () => any] {
   let timer: NodeJS.Timeout;
 
   const debouncedFunc = (args: A): Promise<R> =>

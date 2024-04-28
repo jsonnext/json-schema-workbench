@@ -68,9 +68,13 @@
 
   
   }
+  .dark [type="text"] {
+    color: hsl(var(--background));
+    background-color: hsl(var(--background)) !important;
+  }
 
 }
-
+@import ('~lucide-static/font/Lucide.css');
 @layer base {
   * {
     @apply border-border;
@@ -95,7 +99,13 @@
   .cm6-json-schema-hover--description {
     margin-bottom: 0.5rem;
   }
-
-
+  .dark {
+    input::placeholder, textarea::placeholder {
+      color: hsl(var(--muted-foreground));
+    }
+  }
+  .vertical-layout-item header {
+    display: flex;
+  }
+ 
 }
-

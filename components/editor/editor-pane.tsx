@@ -1,14 +1,14 @@
 "use client"
 
+import { Suspense } from "react"
+import { ErrorBoundary } from "next/dist/client/components/error-boundary"
 import { SchemaState, useMainStore } from "@/store/main"
+import { useTheme } from "next-themes"
 
-// import { JsonForms } from "@jsonforms/react"
-// import { vanillaCells, vanillaRenderers, vanillaStyles } from "@jsonforms/vanilla-renderers"
-
-import { JSONModes } from "@/types/editor"
 import { parse, serialize } from "@/lib/json"
 
 import { JSONEditor } from "./json-editor"
+import { JsonSchemaForm } from "./json-schema-form"
 import { EditorMenu } from "./menu"
 // const SchemaViewer = dynamic(
 //   async () => (await import("./schema-viewer")).SchemaViewer,
@@ -44,9 +44,12 @@ export const EditorPane = ({
   )
 
   const schemaValue = useMainStore((state) => state.schema)
+
+  const theme = useTheme()
+
   return (
     <>
-      <div className="flex items-center justify-between rounded-lg">
+      <div className="flex items-center justify-between rounded-lg overflow-x-auto overflow-y-hidden">
         <h3 className="text-md w-full pl-2 font-medium">{heading}</h3>
         <EditorMenu
           heading={heading}
@@ -55,19 +58,27 @@ export const EditorPane = ({
           setValueString={setValueString}
         />
       </div>
-      <div className="flex-1-1 flex h-full w-full overflow-auto">
+      <div
+        className="flex-1-1 flex h-full w-full overflow-auto"
+        data-theme={theme.theme ?? 'dark'}
+      >
         {value && editorKey === "schema" && editorView === "viewer" ? (
-          <SchemaViewer />
+          <Suspense fallback={<div>Loading...</div>}>
+            <ErrorBoundary
+              errorComponent={(err) => <div>{JSON.stringify(err)}</div>}
+            >
+              <SchemaViewer />
+            </ErrorBoundary>
+          </Suspense>
         ) : null}
-        {/* {editorKey === "testValue" && editorView === "viewer" ? (
-          <JsonForms
-            schema={schemaValue}
-            data={parsedEditorValue}
-            renderers={vanillaRenderers}
-            cells={vanillaCells}
-           onChange={({ data, _errors }) => setValueString(serialize(editorMode,data))}
-          />
-        ) : null} */}
+        {editorKey === "testValue" &&
+        editorView === "viewer" &&
+        schemaValue &&
+        value ? (
+          <Suspense fallback={<div>Loading...</div>}>
+            <JsonSchemaForm editorKey={editorKey} />
+          </Suspense>
+        ) : null}
 
         {editorView === "editor" && (
           <JSONEditor

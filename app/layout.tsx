@@ -1,4 +1,3 @@
-
 import { Metadata } from "next"
 
 import { siteConfig } from "@/config/site"
@@ -8,6 +7,9 @@ import { Toaster } from "@/components/ui/toaster"
 import { SiteHeader } from "@/components/nav/site-header"
 import { TailwindIndicator } from "@/components/nav/tailwind-indicator"
 import { ThemeProvider } from "@/components/providers/theme-provider"
+
+import "@/styles/globals.css"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: {
@@ -52,7 +54,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
             src="https://kit.fontawesome.com/1e1f25269b.js"
             crossOrigin="anonymous"
           ></script> */}
-
         </head>
         <body
           className={cn(
@@ -63,14 +64,18 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="relative flex min-h-screen flex-col">
               <SiteHeader />
-              <div className="flex">{children}</div>
+              <Suspense fallback={<div>Loading...</div>}>
+                <div className="flex flex-col">
+                  {children}
+               
+                </div>
+              </Suspense>
             </div>
             <TailwindIndicator />
           </ThemeProvider>
-          <Toaster  />
+          <Toaster />
         </body>
       </html>
     </>
   )
 }
-import "@/styles/globals.css"

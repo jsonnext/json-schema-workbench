@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { SchemaState, useMainStore } from "@/store/main"
 import { autocompletion } from "@codemirror/autocomplete"
-import { history } from "@codemirror/commands"
+import { history,  } from "@codemirror/commands"
 import {
   bracketMatching,
   foldGutter,
@@ -33,7 +33,6 @@ const commonExtensions = [
   EditorView.lineWrapping,
   EditorState.tabSize.of(2),
   lintGutter(),
-
   gutter({ class: "CodeMirror-lint-markers" }),
   foldGutter(),
   bracketMatching(),
@@ -83,7 +82,7 @@ export const JSONEditor = ({
       value={value ?? "{}"}
       extensions={[...commonExtensions, languageExtension]}
       onChange={onValueChange}
-      theme={theme.theme === "dark" ? jsonDarkTheme : "light"}
+      theme={theme.theme === "light" ? "light": jsonDarkTheme}
       ref={editorRef}
       contextMenu="true"
       {...rest}

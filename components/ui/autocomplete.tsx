@@ -2,13 +2,26 @@
 // based on a user suggestion in an issue
 "use client"
 
-import { CommandGroup, CommandItem, CommandList, CommandInput } from "@/components/ui/command"
+import {
+  JSXElementConstructor,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react"
 import { Command as CommandPrimitive } from "cmdk"
-import { useState, useRef, useCallback, type KeyboardEvent, ReactNode, ReactElement, JSXElementConstructor } from "react"
-
-import { Skeleton } from  "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
 import { Check } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import {
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export type Option = {
   label: string
@@ -23,7 +36,7 @@ type AutoCompleteProps<T> = {
   isLoading?: boolean
   disabled?: boolean
   placeholder?: string
-  Results?: JSXElementConstructor<{ selected?: boolean, option: Option & T }>
+  Results?: JSXElementConstructor<{ selected?: boolean; option: Option & T }>
 }
 
 export const AutoComplete = <T = {}>({
@@ -34,7 +47,7 @@ export const AutoComplete = <T = {}>({
   onValueChange,
   disabled,
   isLoading = false,
-  Results
+  Results,
 }: AutoCompleteProps<T>) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -53,19 +66,25 @@ export const AutoComplete = <T = {}>({
       if (!isOpen) {
         setOpen(true)
       }
-      if(event.key === "Backspace" && input && input.value?.length === (input.selectionEnd ?? 0 - (input?.selectionStart || 0))) {
+      if (
+        event.key === "Backspace" &&
+        input &&
+        input.value?.length ===
+          (input.selectionEnd ?? 0 - (input?.selectionStart || 0))
+      ) {
         setSelected(undefined)
       }
 
-      if(selected && input.value === "") {
+      if (selected && input.value === "") {
         setSelected(undefined)
-
       }
 
       // This is not a default behaviour of the <input /> field
       if (event.key === "Enter" && input.value !== "") {
-        if(input.value !== "") {
-          const optionToSelect = options.find((option) => option.label === input.value)
+        if (input.value !== "") {
+          const optionToSelect = options.find(
+            (option) => option.label === input.value
+          )
           if (optionToSelect) {
             setSelected(optionToSelect)
             onValueChange?.(optionToSelect)
@@ -82,7 +101,7 @@ export const AutoComplete = <T = {}>({
 
   const handleBlur = useCallback(() => {
     setOpen(false)
-    if(selected) {
+    if (selected) {
       setInputValue(selected?.label)
     }
   }, [selected])
@@ -123,7 +142,7 @@ export const AutoComplete = <T = {}>({
       </div>
       <div className="relative mt-1">
         {isOpen ? (
-          <div className="ease-in-outorigin-top-left absolute top-0 z-10 w-full rounded-lg bg-stone-50 outline-none transition duration-150 animate-in fade-in-0 zoom-in-95 dark:bg-slate-800 ">
+          <div className="animate-in fade-in-0 zoom-in-95 absolute top-0 z-10 w-full origin-top-left rounded-lg bg-stone-50 outline-none transition duration-150 ease-in-out dark:bg-slate-800 ">
             <CommandList className="rounded-lg ring-1 ring-slate-200 dark:ring-slate-800">
               {isLoading ? (
                 <CommandPrimitive.Loading>
@@ -146,8 +165,10 @@ export const AutoComplete = <T = {}>({
                         }}
                         tabIndex={0}
                         onSelect={() => handleSelectOption(option)}
-                        className={cn("flex w-full items-center gap-2 hover:dark:bg-slate-900", !isSelected ? "pl-8" : null)}
-                
+                        className={cn(
+                          "flex w-full items-center gap-2 hover:dark:bg-slate-900 focus:dark:bg-slate-900 active:dark:bg-slate-900",
+                          !isSelected ? "pl-8" : null
+                        )}
                       >
                         {isSelected ? <Check className="w-4" /> : null}
                         {Results ? <Results option={option} /> : option.label}

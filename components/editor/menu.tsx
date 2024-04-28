@@ -38,7 +38,9 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 
+import { Badge } from "../ui/badge"
 import { Menubar, MenubarItem, MenubarMenu } from "../ui/menubar"
+import { FileDialog } from "./file-dialog"
 
 export interface EditorMenu {
   heading: string
@@ -76,33 +78,43 @@ export const EditorMenu = ({
           value={editorView}
           type="single"
           onValueChange={(val) => setEditorSetting(editorKey, "view", val)}
-          className="align-self-start m-1"
+          className="align-self-start m-2"
         >
-          <ToggleGroupItem value={"editor"}>editor</ToggleGroupItem>
-          <ToggleGroupItem value={"viewer"}>docs</ToggleGroupItem>
+          <ToggleGroupItem value={"editor"}>
+            <Label>Editor</Label>
+            {editorView !== "editor" && (
+              <Badge className="ml-2">{editorMode}</Badge>
+            )}
+          </ToggleGroupItem>
+          <ToggleGroupItem value={"viewer"}>Docs</ToggleGroupItem>
         </ToggleGroup>
         <Separator orientation="vertical" />
       </Fragment>
-      <ToggleGroup
-        value={editorMode}
-        type="single"
-        onValueChange={(val) => setEditorSetting(editorKey, "mode", val)}
-        className="m-1"
-      >
-        <ToggleGroupItem value={JSONModes.JSON4}>json4</ToggleGroupItem>
-        <ToggleGroupItem value={JSONModes.JSON5}>json5</ToggleGroupItem>
-        <ToggleGroupItem value={JSONModes.YAML}>yaml</ToggleGroupItem>
-      </ToggleGroup>
-      <Separator orientation="vertical" />
+      {editorView === "editor" && (
+        <Fragment>
+          <ToggleGroup
+            value={editorMode}
+            type="single"
+            onValueChange={(val) => setEditorSetting(editorKey, "mode", val)}
+            className="m-2"
+          >
+            <ToggleGroupItem value={JSONModes.JSON4}>json4</ToggleGroupItem>
+            <ToggleGroupItem value={JSONModes.JSON5}>json5</ToggleGroupItem>
+            <ToggleGroupItem value={JSONModes.YAML}>yaml</ToggleGroupItem>
+          </ToggleGroup>
+          <Separator orientation="vertical" />
+        </Fragment>
+      )}
+
       <Menubar className="border-0">
-        <Button title="Import" size="icon" variant={"link"}>
-          <ImportIcon />
+        <Button title="Import" size="icon" variant={"ghost"}>
+          <FileDialog setValueString={setValueString} editorKey={editorKey} />
         </Button>
         <Button
           title="Format"
           onClick={() => formatEditor(editorKey)}
           size="icon"
-          variant={"link"}
+          variant={"ghost"}
         >
           <EraserIcon />
         </Button>
@@ -111,7 +123,7 @@ export const EditorMenu = ({
             title="Fake"
             onClick={() => fakeValue()}
             size="icon"
-            variant={"link"}
+            variant={"ghost"}
           >
             <WandIcon />
           </Button>

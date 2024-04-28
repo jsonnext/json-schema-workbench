@@ -1,6 +1,6 @@
 import { EditorView } from "codemirror"
 import json5 from "json5"
-import { UseBoundStore, create,  } from "zustand"
+import { UseBoundStore, create } from "zustand"
 import {
   PersistOptions,
   createJSONStorage,
@@ -15,6 +15,8 @@ import {
   SchemaResponse,
   SchemaSelectorValue,
 } from "@/components/schema/schema-selector"
+
+import { storage } from "./idb-store"
 
 type EditorViewMode = "editor" | "viewer" | "form"
 
@@ -79,21 +81,13 @@ export type SchemaActions = {
 }
 
 let persistOptions: {
-  name: string,
+  name: string
   storage?: PersistOptions<SchemaState>["storage"]
 } = {
   name: "jsonWorkBench",
+  storage: createJSONStorage(() => storage),
 }
 
-if (typeof window !== undefined) {
-  ;async () => {
-    const idb = (await import("./idb-store")).storage
-    persistOptions = {
-      name: "jsonWorkBench",
-      storage: createJSONStorage(() => idb),
-    }
-  }
-}
 const initialState = {
   userSettings: {
     // theme: "system",
@@ -137,7 +131,20 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
       },
       fakeValue: async () => {
         try {
-          const { JSONSchemaFaker} = await import('json-schema-faker')
+          const { JSONSchemaFaker } = await import("json-schema-faker")
+          JSONSchemaFaker.option({
+            useExamplesValue: true,
+            useDefaultValue: true,
+            sortProperties: true,
+            replaceEmptyByRandomValue: true,
+            reuseProperties: true,
+            optionalsProbability: .9,
+            failOnInvalidFormat: false,
+            failOnInvalidTypes: false,
+            renderDescription: true,
+            renderComment: true,
+            fillProperties: true,
+          })
           const value = await JSONSchemaFaker.resolve(get().schema!)
           if (value) {
             set({
@@ -146,9 +153,13 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
                 value as Record<string, unknown>
               ),
             })
+            toast({
+              title: "Fake data generated",
+              description: "Fake data generated successfully",
+              variant: "secondary",
+            })
           }
-        }
-        catch (err) {
+        } catch (err) {
           // @ts-expect-error
           const errMessage = err?.message || err
           set({ schemaError: errMessage })
@@ -158,7 +169,6 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             variant: "destructive",
           })
         }
-        
       },
       // don't set pristine schema here to avoid triggering updates
       setSchema: (schema: Record<string, unknown>) => {
@@ -181,9 +191,11 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
       },
       setSchemaString: (schema: string) => {
         try {
+          const schemaMode = get().getMode("schema")
+          const parsedSchema = parse(schemaMode, schema)
           return set({
-            schema: parse(get().getMode("schema"), schema),
-            schemaString: schema,
+            schema: parsedSchema,
+            schemaString: serialize(schemaMode, parsedSchema),
             schemaError: undefined,
           })
         } catch (e) {
@@ -323,7 +335,11 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           ).text()
           const parsed = parse(mode, data)
           schemas[url] = parsed
-          return { schemaString: data, schema: parsed, schemas }
+          return {
+            schemaString: serialize(mode, parsed),
+            schema: parsed,
+            schemas,
+          }
         } catch (e) {
           toast({
             title: "Error fetching schema",
@@ -333,6 +349,14 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           })
           // @ts-expect-error
           set({ schemaError: e.message })
+        }
+      },
+      setDirectSelectedSchema: async (schema) => {
+        return {
+          selectedSchema: {
+            label: schema.title ?? schema.description ?? "imported schema",
+          },
+          schema
         }
       },
       setSelectedSchema: async (selectedSchema) => {

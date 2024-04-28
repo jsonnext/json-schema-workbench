@@ -10,27 +10,34 @@ const JsonSchemaViewer = dynamic(
 
 export const SchemaViewer = () => {
   const theme = useTheme()
-  const schemaInfo = useMainStore((state) => state.selectedSchema!)
-  const schemaValue = useMainStore((state) => state.schema)
+  const schemaValue = useMainStore((state) => state.schema ?? {})
   injectStyles()
 
   return (
-    <div className="overflow-scroll p-4" data-theme={theme.theme}>
+    <div
+      className="w-full overflow-scroll p-4"
+      data-theme={theme?.theme ?? "dark"}
+    >
       <div>
-        {schemaInfo.label && (
-          <h2 className="text-lg dark:text-slate-300">{schemaInfo.label}</h2>
-        )}
-        {schemaInfo.description && (
+        {schemaValue?.title ? (
+          <h2 className="text-lg">{schemaValue.title as string}</h2>
+        ) : null}
+        {schemaValue?.description ? (
+          <h2 className="text-sm text-muted-foreground">
+            {schemaValue.description as string}
+          </h2>
+        ) : null}
+        {/* {schemaInfo.description && (
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
             {schemaInfo.description}
           </p>
-        )}
+        )} */}
         {/* {schemaValue?.title && (
           <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
             {schemaValue?.title ?? ""}
           </p>
         )} */}
-        {schemaInfo.fileMatch && (
+        {/* {schemaInfo.fileMatch && (
           <p className="mt-1 whitespace-break-spaces text-sm text-slate-600 dark:text-slate-300">
             {schemaInfo.fileMatch.map((f) => (
               <code
@@ -41,11 +48,11 @@ export const SchemaViewer = () => {
               </code>
             ))}
           </p>
-        )}
+        )} */}
       </div>
       <div className="p-4">
         <JsonSchemaViewer
-          schema={schemaValue ?? {}}
+          schema={schemaValue}
           emptyText="No schema defined"
           defaultExpandedDepth={1}
           skipTopLevelDescription={false}
