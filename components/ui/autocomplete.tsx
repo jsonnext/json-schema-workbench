@@ -53,7 +53,7 @@ export const AutoComplete = <T = {}>({
       if (!isOpen) {
         setOpen(true)
       }
-      if(event.key === "Backspace" && input && input.value.length === (input.selectionEnd ?? 0 - (input?.selectionStart || 0))) {
+      if(event.key === "Backspace" && input && input.value?.length === (input.selectionEnd ?? 0 - (input?.selectionStart || 0))) {
         setSelected(undefined)
       }
 
@@ -132,7 +132,7 @@ export const AutoComplete = <T = {}>({
                   </div>
                 </CommandPrimitive.Loading>
               ) : null}
-              {options.length > 0 && !isLoading ? (
+              {options?.length > 0 && !isLoading ? (
                 <CommandGroup>
                   {options.map((option) => {
                     const isSelected = selected?.value === option.value

@@ -84,4 +84,9 @@
   .dark code {
     filter: brightness(var(--background));
   }
+
+  .dark .sl-bg-code {
+    background-color: var(--background);
+  }
 }
+

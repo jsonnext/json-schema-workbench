@@ -4,6 +4,8 @@ import {HighlightStyle, syntaxHighlighting} from "@codemirror/language"
 import {tags as t} from "@lezer/highlight"
 import { createTheme } from '@uiw/codemirror-themes';
 
+export { useTheme } from 'next-themes'
+
 // Using https://github.com/one-dark/vscode-one-dark-theme/ as reference for the colors
 
 const chalky = "#e5c07b",
@@ -119,7 +121,7 @@ export const oneDarkTheme = EditorView.theme({
 }, {dark: true})
 
 /// The highlighting style for code in the One Dark theme.
-export const oneDarkHighlightStyle = HighlightStyle.define([
+export const jsonDarkHighlightStyle = HighlightStyle.define([
   {tag: t.keyword,
    color: violet},
   {tag: [t.name, t.deleted, t.character, t.propertyName, t.macroName],
@@ -158,7 +160,7 @@ export const oneDarkHighlightStyle = HighlightStyle.define([
 
 /// Extension to enable the One Dark theme (both the editor theme and
 /// the highlight style).
-export const jsonDark: Extension = [oneDarkTheme, syntaxHighlighting(oneDarkHighlightStyle)]
+export const jsonDark: Extension = [oneDarkTheme, syntaxHighlighting(jsonDarkHighlightStyle)]
 
 export const jsonDarkTheme = createTheme({
   theme: 'dark',

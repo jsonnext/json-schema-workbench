@@ -1,27 +1,31 @@
-"use client"
-
 import { useEffect, useRef } from "react"
 import { SchemaState, useMainStore } from "@/store/main"
 import { autocompletion } from "@codemirror/autocomplete"
 import { history } from "@codemirror/commands"
-import { syntaxHighlighting } from "@codemirror/language"
+import {
+  bracketMatching,
+  foldGutter,
+  indentOnInput,
+  syntaxHighlighting,
+} from "@codemirror/language"
+import { lintGutter } from "@codemirror/lint"
 import { EditorState } from "@codemirror/state"
-import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark"
-import { EditorView } from "@codemirror/view"
+import { EditorView, gutter, lineNumbers } from "@codemirror/view"
 import CodeMirror, {
   ReactCodeMirrorProps,
   ReactCodeMirrorRef,
 } from "@uiw/react-codemirror"
 import { jsonSchema, updateSchema } from "codemirror-json-schema"
-// @ts-expect-error TODO: fix this in the lib!
 import { json5Schema } from "codemirror-json-schema/json5"
-import json5 from "json5"
-
-import { JSONModes } from "@/types/editor"
-import { serialize } from "@/lib/json"
+import { yamlSchema } from "codemirror-json-schema/yaml"
 
 // import { debounce } from "@/lib/utils"
-import { jsonDark, jsonDarkTheme } from "./theme"
+import {
+  jsonDark,
+  jsonDarkHighlightStyle,
+  jsonDarkTheme,
+  useTheme,
+} from "./theme"
 
 /**
  * none of these are required for json4 or 5
@@ -30,18 +34,24 @@ import { jsonDark, jsonDarkTheme } from "./theme"
 const commonExtensions = [
   history(),
   autocompletion(),
-  jsonDark,
   EditorView.lineWrapping,
   EditorState.tabSize.of(2),
-  syntaxHighlighting(oneDarkHighlightStyle),
+  lintGutter(),
+
+  gutter({ class: "CodeMirror-lint-markers" }),
+  foldGutter(),
+  bracketMatching(),
+  lineNumbers(),
+  indentOnInput(),
 ]
 
 const languageExtensions = {
   json4: jsonSchema,
   json5: json5Schema,
+  yaml: yamlSchema,
 }
 
-export interface JSONEditorProps extends Omit<ReactCodeMirrorProps, 'value'> {
+export interface JSONEditorProps extends Omit<ReactCodeMirrorProps, "value"> {
   onValueChange?: (newValue: string) => void
   schema?: Record<string, unknown>
   editorKey: keyof SchemaState["editors"]
@@ -55,27 +65,29 @@ export const JSONEditor = ({
   ...rest
 }: JSONEditorProps) => {
   const editorMode = useMainStore(
-    (state) =>
-      state.editors[editorKey as keyof SchemaState["editors"]].mode ??
-      state.userSettings.mode
+    (state) => state.editors[editorKey].mode ?? state.userSettings.mode
   )
   const languageExtension = languageExtensions[editorMode](schema)
   const editorRef = useRef<ReactCodeMirrorRef>(null)
 
   useEffect(() => {
-    if (!schema || !editorRef?.current?.view) {
+    if (
+      !schema ||
+      !editorRef?.current?.view ||
+      Object.keys(schema)?.length === 0
+    ) {
       return
     }
     updateSchema(editorRef?.current.view, schema)
   }, [schema])
-
+  const theme = useTheme()
 
   return (
     <CodeMirror
       value={value ?? "{}"}
       extensions={[...commonExtensions, languageExtension]}
       onChange={onValueChange}
-      theme={jsonDarkTheme}
+      theme={theme.theme === "dark" ? jsonDarkTheme : "light"}
       ref={editorRef}
       contextMenu="true"
       {...rest}
