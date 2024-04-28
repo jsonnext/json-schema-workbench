@@ -6,7 +6,6 @@ import {
   bracketMatching,
   foldGutter,
   indentOnInput,
-  syntaxHighlighting,
 } from "@codemirror/language"
 import { lintGutter } from "@codemirror/lint"
 import { EditorState } from "@codemirror/state"
@@ -16,16 +15,13 @@ import CodeMirror, {
   ReactCodeMirrorRef,
 } from "@uiw/react-codemirror"
 import { jsonSchema, updateSchema } from "codemirror-json-schema"
+// @ts-expect-error
 import { json5Schema } from "codemirror-json-schema/json5"
+// @ts-expect-error
 import { yamlSchema } from "codemirror-json-schema/yaml"
 
 // import { debounce } from "@/lib/utils"
-import {
-  jsonDark,
-  jsonDarkHighlightStyle,
-  jsonDarkTheme,
-  useTheme,
-} from "./theme"
+import { jsonDarkTheme, useTheme } from "./theme"
 
 /**
  * none of these are required for json4 or 5

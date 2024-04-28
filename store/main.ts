@@ -1,7 +1,7 @@
 import { EditorView } from "codemirror"
 import json5 from "json5"
 import { JSONSchemaFaker } from "json-schema-faker"
-import { UseBoundStore, create } from "zustand"
+import { UseBoundStore, create,  } from "zustand"
 import {
   PersistOptions,
   createJSONStorage,
@@ -74,10 +74,17 @@ export type SchemaActions = {
   getMode: (editorKey?: keyof SchemaState["editors"]) => JSONModes
   fetchSchema: (
     url: string
-  ) => Promise<{ schemaString: string; schema: Record<string, unknown> }>
+  ) => Promise<
+    { schemaString: string; schema: Record<string, unknown> } | undefined
+  >
 }
 
-let persistOptions = {}
+let persistOptions: {
+  name: string,
+  storage?: PersistOptions<SchemaState>["storage"]
+} = {
+  name: "jsonWorkBench",
+}
 
 if (typeof window !== undefined) {
   ;async () => {
@@ -110,7 +117,7 @@ const initialState = {
 }
 
 export const useMainStore = create<SchemaState & SchemaActions>()<
-  [["zustand/persist", unknown], ["zustand/devtools", never]]
+  [["zustand/persist", SchemaState], ["zustand/devtools", never]]
 >(
   persist(
     devtools((set, get) => ({
@@ -130,13 +137,15 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
         return get().userSettings.mode
       },
       fakeValue: async () => {
-        const value = await JSONSchemaFaker.resolve(get().schema)
-        if(value) {
+        const value = await JSONSchemaFaker.resolve(get().schema!)
+        if (value) {
           set({
-            testValueString: serialize(get().getMode("testValue"), value),
+            testValueString: serialize(
+              get().getMode("testValue"),
+              value as Record<string, unknown>
+            ),
           })
         }
-        
       },
       // don't set pristine schema here to avoid triggering updates
       setSchema: (schema: Record<string, unknown>) => {
@@ -149,9 +158,11 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
         } catch (e) {
           toast({
             title: "Error setting schema",
+            // @ts-expect-error
             description: e.message,
             variant: "destructive",
           })
+          // @ts-expect-error
           set({ schemaError: e.message })
         }
       },
@@ -165,10 +176,12 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
         } catch (e) {
           toast({
             title: "Error parsing schema",
+            // @ts-expect-error
             description: e.message,
             variant: "destructive",
           })
-          set({ schemaError: e.message })
+          // @ts-expect-error
+          set({ schemaError: e!.message })
         }
       },
       setTestValueString: (testValue) => {
@@ -221,6 +234,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
               // if there is a parsing or serialization error, do not update state
               toast({
                 title: "Error changing mode",
+                // @ts-expect-error
                 description: e.message,
                 variant: "destructive",
               })
@@ -250,6 +264,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           } catch (e) {
             toast({
               title: "Error formatting editor",
+              // @ts-expect-error
               description: e.message,
               variant: "destructive",
             })
@@ -272,13 +287,15 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
           } catch (e) {
             toast({
               title: "Error fetching schema",
+              // @ts-expect-error
               description: e.message,
               variant: "destructive",
             })
-          
+
             return {
               schemaString: "",
               schema: {},
+              // @ts-expect-error
               schemaError: e.message,
             }
           }
@@ -297,18 +314,26 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
         } catch (e) {
           toast({
             title: "Error fetching schema",
+            // @ts-expect-error
             description: e.message,
             variant: "destructive",
           })
+          // @ts-expect-error
           set({ schemaError: e.message })
         }
       },
       setSelectedSchema: async (selectedSchema) => {
         try {
           let selected = selectedSchema
-          const { schemaString: data, schema } = await get().fetchSchema(
-            selectedSchema.value
-          )
+          const result = await get().fetchSchema(selectedSchema.value)
+          if (!result) {
+            return void toast({
+              title: "Error loading schema",
+              description: "No schema found",
+              variant: "destructive",
+            })
+          }
+          const { schema, schemaString: data } = result
           if (!selectedSchema.label) {
             selected = {
               label:
@@ -325,7 +350,7 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             selectedSchema: selected as SchemaSelectorValue,
             schemaError: undefined,
           })
-          if (typeof window !== "undefined") {
+          if (typeof window !== "undefined" && selectedSchema.value) {
             // @ts-expect-error
             const url = new URL(window.location)
             url.searchParams.set("url", selectedSchema.value)
@@ -362,8 +387,10 @@ export const useMainStore = create<SchemaState & SchemaActions>()<
             schema && schema["$schema"]
               ? (schema["$schema"] as string)
               : "https://json-schema.org/draft/2020-12/schema"
-          const { schema: schemaSpec } = await get().fetchSchema(schemaUrl)
-          set({ schemaSpec })
+          const result = await get().fetchSchema(schemaUrl)
+          if (result) {
+            set({ schemaSpec: result.schema })
+          }
         } catch (err) {
           // @ts-expect-error
           const errMessage = err?.message || err

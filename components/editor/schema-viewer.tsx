@@ -1,7 +1,7 @@
 import { useMainStore } from "@/store/main"
+import { JsonSchemaViewer } from "@stoplight/json-schema-viewer"
 import { injectStyles } from "@stoplight/mosaic"
 import { useTheme } from "next-themes"
-import { JsonSchemaViewer } from "@stoplight/json-schema-viewer"
 
 export const SchemaViewer = () => {
   const theme = useTheme()
@@ -10,7 +10,7 @@ export const SchemaViewer = () => {
   injectStyles()
 
   return (
-    <div className="p-4 overflow-scroll" data-theme={theme.theme}>
+    <div className="overflow-scroll p-4" data-theme={theme.theme}>
       <div>
         {schemaInfo.label && (
           <h2 className="text-lg dark:text-slate-300">{schemaInfo.label}</h2>
@@ -42,10 +42,8 @@ export const SchemaViewer = () => {
         <JsonSchemaViewer
           schema={schemaValue ?? {}}
           emptyText="No schema defined"
-          hideTopBar={false}
           defaultExpandedDepth={1}
           skipTopLevelDescription={false}
-          skipDescription={false}
         />
       </div>
     </div>

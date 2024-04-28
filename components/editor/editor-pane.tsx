@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic"
 import { SchemaState, useMainStore } from "@/store/main"
-
 // import { JsonForms } from "@jsonforms/react"
 // import { vanillaCells, vanillaRenderers, vanillaStyles } from "@jsonforms/vanilla-renderers"
 import { Provider as MosaicProvider } from "@stoplight/mosaic"
@@ -10,14 +9,14 @@ import { Provider as MosaicProvider } from "@stoplight/mosaic"
 import { JSONModes } from "@/types/editor"
 import { parse, serialize } from "@/lib/json"
 
+import { JSONEditor } from "./json-editor"
+import { EditorMenu } from "./menu"
 // const SchemaViewer = dynamic(
 //   async () => (await import("./schema-viewer")).SchemaViewer,
 //   { ssr: false }
 // )
 
 import { SchemaViewer } from "./schema-viewer"
-import { JSONEditor } from "./json-editor"
-import { EditorMenu } from "./menu"
 
 // const JSONEditor = dynamic(
 //   async () => (await import("./json-editor")).JSONEditor,
@@ -46,10 +45,6 @@ export const EditorPane = ({
   )
 
   const schemaValue = useMainStore((state) => state.schema)
-  const editorMode = useMainStore(
-    (state) => state.editors[editorKey].mode ?? state.userSettings.mode
-  )
-
   return (
     <>
       <div className="flex items-center justify-between rounded-lg">
@@ -61,10 +56,11 @@ export const EditorPane = ({
           setValueString={setValueString}
         />
       </div>
-      <div className="flex flex-1-1 overflow-auto w-full h-full">
+      <div className="flex-1-1 flex h-full w-full overflow-auto">
         {value && editorKey === "schema" && editorView === "viewer" ? (
-      
+          <MosaicProvider>
             <SchemaViewer />
+          </MosaicProvider>
         ) : null}
         {/* {editorKey === "testValue" && editorView === "viewer" ? (
           <JsonForms
@@ -83,12 +79,11 @@ export const EditorPane = ({
             // json schema spec v? allow spec selection
             schema={schemaValue}
             editorKey={editorKey}
-            className="flex flex-1-1 w-full h-full"
+            className="flex-1-1 flex h-full w-full"
             height="100%"
             width="100%"
             value={value}
             {...props}
-            mode={editorMode}
           />
         )}
       </div>

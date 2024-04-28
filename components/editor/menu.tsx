@@ -79,7 +79,7 @@ export const EditorMenu = ({
           className="align-self-start m-1"
         >
           <ToggleGroupItem value={"editor"}>editor</ToggleGroupItem>
-          <ToggleGroupItem value={"viewer"}>viewer</ToggleGroupItem>
+          <ToggleGroupItem value={"viewer"}>docs</ToggleGroupItem>
         </ToggleGroup>
         <Separator orientation="vertical" />
       </Fragment>
