@@ -18,7 +18,9 @@ import {
   SchemaSelectorValue,
 } from "@/components/schema/schema-selector"
 
+  
 import { storage } from "./idb-store"
+import dynamic from "next/dynamic"
 
 type EditorViewMode = "editor" | "viewer" | "form"
 

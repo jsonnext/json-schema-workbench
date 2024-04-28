@@ -5,8 +5,17 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { JSONSchemaEditor } from "@/components/editor/json-schema-editor"
-import { JSONValueEditor } from "@/components/editor/json-value-editor"
+import dynamic from "next/dynamic"
+
+
+const JSONSchemaEditor = dynamic(
+  async () => (await import("@/components/editor/json-schema-editor")).JSONSchemaEditor,
+  { ssr: false }
+)
+const JSONValueEditor = dynamic(
+  async () => (await import("@/components/editor/json-value-editor")).JSONValueEditor,
+  { ssr: false }
+)
 
 export default function IndexPage({
   searchParams,

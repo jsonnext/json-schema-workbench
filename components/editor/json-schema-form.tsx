@@ -90,13 +90,10 @@ const styleContextValue = {
       classNames:
         "border border-gray-300 rounded-md p-2 m-2 bg-accent font-bold",
     },
-    {
-      name: "array.table",
-      classNames: "w-full",
-    },
+
     {
       name: "array.table.table",
-      classNames: "w-full text-center m-2 ml-[200px]",
+      classNames: "ml-[200px] text-center m-2 w-max",
     },
     {
         name: "array.table.table.thead",
