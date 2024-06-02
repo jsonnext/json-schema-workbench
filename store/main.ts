@@ -1,5 +1,4 @@
 import { EditorView } from "codemirror"
-import { JSONMode } from "codemirror-json-schema"
 import json5 from "json5"
 import { UseBoundStore, create } from "zustand"
 import {
