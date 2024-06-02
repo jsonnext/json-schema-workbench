@@ -78,10 +78,33 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  code {
-    filter: brightness(0.85);
+  code, pre {
+    filter: brightness(0.8);
   }
-  .dark code {
-    filter: brightness(var(--background));
-  }
+  
+}
+
+
+.cm-lintRange-error {
+  text-decoration: underline wavy red;
+}
+.cm6-json-schema-hover,
+.cm-editor .cm-diagnostic-error {
+  font-size: 0.9rem;
+  padding: 0.5rem;
+}
+.cm6-json-schema-hover--description {
+  padding-bottom: 0.5rem;
+  margin-bottom: .5rem;
+  max-width: 600px;
+  border-bottom: 1px solid #888;
+}
+
+.cm6-json-schema-hover--code-wrapper {
+  font-size: .9rem;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 0.3rem;
+  background-color: white;
+  color: black;
+  display: inline-block;
 }
